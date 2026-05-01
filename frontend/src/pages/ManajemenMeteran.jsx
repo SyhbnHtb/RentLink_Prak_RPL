@@ -1,6 +1,8 @@
+import AdminLayout from "../components/AdminLayout";
+
 export default function ManajemenMeteran() {
   return (
-    <div className="min-w-screen min-h-screen">
+    <>
       <div className="flex p-2.5 flex-col items-start gap-2.5 rounded-[12.3px] border-2 border-[#B0E4CC] bg-[#FFF] w-[359px] absolute left-[1976px] top-0">
         <div className="flex flex-col items-start w-[309px]">
           <div className="flex flex-col items-start w-full">
@@ -44,178 +46,7 @@ export default function ManajemenMeteran() {
           </p>
         </button>
       </div>
-      <div className="flex justify-center items-start bg-[#FFF] w-[1920px] h-full absolute left-0 top-0 overflow-hidden">
-        <div className="flex min-h-[926.112px] flex-col items-start shrink-0 bg-linear-[180deg,#285A480%,#091413100%] w-[340px] h-full">
-          <div className="flex pt-[43px] pr-[37px] pb-[31px] pl-[37px] flex-col items-start w-full">
-            <p className="text-[#FFF] font-sora text-[31px] font-semibold w-full tracking-[0.01em]">
-              Dashboard
-            </p>
-          </div>
-          <div className="flex py-0 px-3 flex-col items-start w-full">
-            <div className="flex pt-[19px] pr-[25px] pb-[31px] pl-[25px] items-center gap-[15px] border-b-[1.54px] border-b-[rgba(255,255,255,0.12)] w-full">
-              <div className="flex justify-center items-center rounded-[29.3px] bg-[#408A71] w-[59px] h-[59px]">
-                <svg
-                  width="31"
-                  height="31"
-                  viewBox="0 0 31 31"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="shrink-0 w-[31px] h-[31px] overflow-hidden relative "
-                >
-                  <path
-                    d="M15.4361 15.4351C18.909 15.4351 21.6101 12.7339 21.6101 9.26099C21.6101 5.78807 18.909 3.08691 15.4361 3.08691C11.9631 3.08691 9.26197 5.78807 9.26197 9.26099C9.26197 12.7339 11.9631 15.4351 15.4361 15.4351ZM15.4361 18.5221C11.32 18.5221 3.08789 20.5801 3.08789 24.6962V27.7832H27.7842V24.6962C27.7842 20.5801 19.5521 18.5221 15.4361 18.5221Z"
-                    fill="#B0E4CC"
-                  />
-                </svg>
-              </div>
-              <div className="flex flex-col items-start w-fit">
-                <p className="text-[#408A71] font-plusJakartaSans text-[15px] w-fit">
-                  XianyinksDelEsol User_Email@ddress
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="flex py-[25px] px-3 flex-col items-start gap-1.5 w-[340px]">
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M3.08643 13.3771H11.3185V3.08691H3.08643V13.3771ZM3.08643 21.6092H11.3185V15.4351H3.08643V21.6092ZM13.3766 21.6092H21.6087V11.319H13.3766V21.6092ZM13.3766 3.08691V9.261H21.6087V3.08691H13.3766Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Dashboard
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M3.08643 13.3771H11.3185V3.08691H3.08643V13.3771ZM3.08643 21.6092H11.3185V15.4351H3.08643V21.6092ZM13.3766 21.6092H21.6087V11.319H13.3766V21.6092ZM13.3766 3.08691V9.261H21.6087V3.08691H13.3766Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Manajemen Unit
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M3.08643 13.3771H11.3185V3.08691H3.08643V13.3771ZM3.08643 21.6092H11.3185V15.4351H3.08643V21.6092ZM13.3766 21.6092H21.6087V11.319H13.3766V21.6092ZM13.3766 3.08691V9.261H21.6087V3.08691H13.3766Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Manajemen Kontrak
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] bg-[rgba(255,255,255,0.10)] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M3.08643 13.3771H11.3185V3.08691H3.08643V13.3771ZM3.08643 21.6092H11.3185V15.4351H3.08643V21.6092ZM13.3766 21.6092H21.6087V11.319H13.3766V21.6092ZM13.3766 3.08691V9.261H21.6087V3.08691H13.3766Z"
-                  fill="#B0E4CC"
-                />
-              </svg>
-              <p className="text-[#B0E4CC] font-plusJakartaSans text-xl font-medium w-fit">
-                Manajemen Meteran
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M14.4059 2.05811H6.17375C5.04183 2.05811 4.11572 2.98422 4.11572 4.11613V20.5804C4.11572 21.7123 5.03154 22.6384 6.17375 22.6384H18.5219C19.6538 22.6384 20.5799 21.7123 20.5799 20.5804V8.23219L14.4059 2.05811ZM16.4639 18.5223H8.23178V16.4643H16.4639V18.5223ZM16.4639 14.4063H8.23178V12.3482H16.4639V14.4063ZM13.3768 9.2612V3.60163L19.0364 9.2612H13.3768Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Tagihan &amp; Pembayaran
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M14.4059 2.05811H6.17375C5.04183 2.05811 4.11572 2.98422 4.11572 4.11613V20.5804C4.11572 21.7123 5.03154 22.6384 6.17375 22.6384H18.5219C19.6538 22.6384 20.5799 21.7123 20.5799 20.5804V8.23219L14.4059 2.05811ZM16.4639 18.5223H8.23178V16.4643H16.4639V18.5223ZM16.4639 14.4063H8.23178V12.3482H16.4639V14.4063ZM13.3768 9.2612V3.60163L19.0364 9.2612H13.3768Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Riwayat Transaksi
-              </p>
-            </div>
-            <div className="flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full">
-              <svg
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-[25px] h-[25px] overflow-hidden relative "
-              >
-                <path
-                  d="M12.3478 12.3483C14.622 12.3483 16.4639 10.5064 16.4639 8.23227C16.4639 5.95815 14.622 4.11621 12.3478 4.11621C10.0737 4.11621 8.23178 5.95815 8.23178 8.23227C8.23178 10.5064 10.0737 12.3483 12.3478 12.3483ZM12.3478 14.4063C9.60037 14.4063 4.11572 15.7852 4.11572 18.5224V20.5804H20.5799V18.5224C20.5799 15.7852 15.0953 14.4063 12.3478 14.4063Z"
-                  fill="#B0E4CC"
-                  fillOpacity="0.7"
-                />
-              </svg>
-              <p className="text-[rgba(176,228,204,0.70)] font-plusJakartaSans text-xl font-medium w-fit">
-                Biodata
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex min-w-[1580.426px] pt-[43px] pr-[43px] pb-[43px] pl-[37px] flex-col items-start gap-[31px] bg-[#FFF] w-fit h-full overflow-hidden">
-          <div className="flex flex-col items-start w-full">
-            <p className="text-[#285A48] font-sora text-[34px] font-semibold w-fit">
-              Selamat Datang Kembali, Xianyinks!
-            </p>
-          </div>
+    <AdminLayout title="Selamat Datang Kembali, Xianyinks!">
           <div className="grid w-full h-[120px]">
             <div className="flex py-[22px] px-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] w-full">
               <div className="flex flex-col items-start w-full">
@@ -380,8 +211,7 @@ export default function ManajemenMeteran() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+    </AdminLayout>
+    </>
   );
 }

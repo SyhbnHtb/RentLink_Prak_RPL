@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import VerificationPage from './pages/VerificationPage'
@@ -13,7 +13,8 @@ import RiwayatPembayaran from './pages/RiwayatPembayaran'
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<div>RentLink Home</div>} />
+      {/* Redirect root langsung ke halaman login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/verification" element={<VerificationPage />} />
