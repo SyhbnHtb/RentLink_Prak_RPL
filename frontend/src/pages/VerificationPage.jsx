@@ -3,60 +3,61 @@ import AuthBackground from "../components/AuthBackground";
 export default function VerificationPage() {
   return (
     <AuthBackground>
-      <div className="rounded-[45px] w-[1280px] h-[960px] absolute left-80 top-[60px] overflow-hidden">
-        <div className="bg-[rgba(217,217,217,0.20)] shadow-[04px4px0rgba(0,0,0,0.25)] w-[1271px] h-full absolute -left-0.5 top-px"></div>
-        <div className="rounded-[40px] bg-[radial-gradient(198.87%100%at50%0%,#0914130%,#408A71100%)] shadow-[04px4px0rgba(0,0,0,0.25)] w-[862px] h-full absolute left-[418px] top-0"></div>
-        <div className="flex flex-col items-center gap-[47px] w-[839px] absolute left-[430px] top-[210px]">
-          <p className="text-[#FBF8F3] font-roboto text-5xl font-bold leading-[0.908em] w-[509px] h-[141px] text-center tracking-[0.15em]">
-            Please Verify Your Account
-          </p>
-          <div className="w-[561px] h-[134px] relative">
-            <p className="text-[#FBF8F3] font-roboto text-xl font-bold leading-[0.908em] w-[560px] h-10 absolute left-px top-0 text-center tracking-[0.15em]">
-              Enter the Six Digit Code We Send to Your Email Address to Verify
-              Your Account
+      {/* Main Card Container */}
+      <div className="flex w-full max-w-5xl rounded-[40px] shadow-2xl overflow-hidden min-h-[700px] bg-[rgba(217,217,217,0.20)] backdrop-blur-md">
+        
+        {/* Left Side: Transparent/Glass */}
+        <div className="hidden md:block w-[40%] bg-transparent relative">
+          {/* Glassmorphism effect is handled by parent backdrop-blur */}
+        </div>
+        
+        {/* Right Side: Content */}
+        <div className="w-full md:w-[60%] bg-[radial-gradient(198.87%100%at50%0%,#0914130%,#408A71100%)] p-12 flex flex-col justify-center items-center relative shadow-[-10px_0_20px_rgba(0,0,0,0.1)] rounded-l-[40px] md:rounded-l-[40px] rounded-[40px] border-l border-white/10">
+          
+          <h1 className="text-[#FBF8F3] font-roboto text-4xl md:text-5xl font-bold tracking-[0.15em] text-center mb-12 leading-tight">
+            Please Verify<br />Your Account
+          </h1>
+          
+          <div className="max-w-md mx-auto w-full flex flex-col items-center">
+            
+            <p className="text-[#FBF8F3] font-roboto text-sm md:text-base font-bold text-center tracking-[0.1em] mb-8 leading-relaxed">
+              Enter the Six Digit Code We Send to Your Email Address to Verify Your Account
             </p>
-            <div className="inline-flex justify-center items-start gap-[22px] flex-wrap w-[560px] absolute left-0 top-[62px]">
-              {[57, 135, 213, 291, 369, 447].map((leftPos, i) => (
-                <svg
-                  key={i}
-                  width="56"
-                  height="72"
-                  viewBox="0 0 56 72"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`w-14 h-[72px] absolute top-0`}
-                  style={{ left: `${leftPos}px` }}
-                >
-                  <path
-                    d="M0 10C0 4.47715 4.47715 0 10 0H46C51.5229 0 56 4.47715 56 10V62C56 67.5228 51.5228 72 46 72H10C4.47715 72 0 67.5228 0 62V10Z"
-                    fill="#D9D9D9"
-                  />
-                </svg>
+            
+            {/* OTP Inputs */}
+            <div className="flex justify-center items-center gap-2 md:gap-4 mb-12 w-full">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <input 
+                  key={index}
+                  type="text" 
+                  maxLength={1}
+                  className="w-10 h-14 md:w-14 md:h-16 bg-[#D9D9D9] rounded-[10px] text-center text-black text-2xl font-bold outline-none focus:ring-2 focus:ring-[#B0E4CC]"
+                />
               ))}
             </div>
+            
+            {/* Submit Button */}
+            <div className="w-full flex justify-center mb-8">
+              <button 
+                type="button" 
+                className="w-[300px] h-14 bg-[#B0E4CC] rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-roboto text-3xl font-bold tracking-[0.15em] shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:bg-[#8ecba9] transition-colors"
+                style={{ textShadow: "0px 2px 4px rgba(0,0,0,0.3)" }}
+              >
+                Verify
+              </button>
+            </div>
+            
+            {/* Links */}
+            <div className="text-center flex flex-col items-center gap-2">
+              <p className="text-[#FBF8F3] font-roboto text-sm font-bold">
+                Not receive any verification code? <a href="#" className="text-[#3B82F6] hover:underline">Click here</a> to resend the code
+              </p>
+              <p className="text-[#FBF8F3] font-roboto text-sm font-bold">
+                Having trouble? <a href="#" className="text-[#3B82F6] hover:underline">Help</a>
+              </p>
+            </div>
+            
           </div>
-          <div className="w-[301px] h-14 relative">
-            <svg
-              width="300"
-              height="56"
-              viewBox="0 0 300 56"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-[300px] h-14 absolute left-px top-0"
-            >
-              <path
-                d="M0 10C0 4.47715 4.47715 0 10 0H290C295.523 0 300 4.47715 300 10V46C300 51.5229 295.523 56 290 56H10C4.47716 56 0 51.5228 0 46V10Z"
-                fill="#B0E4CC"
-              />
-            </svg>
-            <p className="flex flex-col justify-center text-[#FBF8F3] font-roboto text-4xl font-bold leading-[0.908em] w-[300px] h-14 absolute left-0 top-0 text-center tracking-[0.15em]">
-              Verify
-            </p>
-          </div>
-          <p className="text-[#004DFF] font-roboto text-base font-bold w-[560px]">
-            Not receive any verification code? Click here to resend the code.
-            Having trouble? Help
-          </p>
         </div>
       </div>
     </AuthBackground>

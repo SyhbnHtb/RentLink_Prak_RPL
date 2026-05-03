@@ -1,16 +1,32 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #215344;
+  --color-primary-hover: #194034;
+  --color-secondary: #a3d5c0;
+  --color-secondary-hover: #8ec3ad;
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-danger: #d03043;
+  --color-warning: #f1a94e;
+  --color-success: #1b8a53;
 }
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  line-height: 1.5;
-  color: #1a1a1a;
-  background-color: #ffffff;
-}
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-#root {
-  min-height: 100vh;
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    background-color: var(--color-background);
+    color: #1a1a1a;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
 }

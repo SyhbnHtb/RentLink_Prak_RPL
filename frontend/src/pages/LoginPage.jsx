@@ -1,107 +1,102 @@
 import AuthBackground from "../components/AuthBackground";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Login_page() {
+export default function LoginPage() {
+  const navigate = useNavigate();
   return (
     <AuthBackground>
-      <div className="rounded-[45px] w-[1280px] h-[960px] absolute left-80 top-[60px] overflow-hidden">
-        <div className="bg-[rgba(217,217,217,0.20)] shadow-[04px4px0rgba(0,0,0,0.25)] w-[1271px] h-[959px] absolute -left-0.5 top-px"></div>
-        <div className="rounded-[40px] bg-[radial-gradient(198.87%100%at50%0%,#0914130%,#408A71100%)] shadow-[04px4px0rgba(0,0,0,0.25)] w-[862px] h-[960px] absolute left-[418px] top-0"></div>
-        <div className="flex flex-col items-center gap-[47px] w-[839px] absolute left-[441px] top-[104px]">
-          <p className="text-[#FBF8F3] font-roboto text-5xl font-bold leading-[0.908em] w-[360px] h-16 text-center tracking-[0.15em]">
+      {/* Main Card Container */}
+      <div className="flex w-full max-w-6xl rounded-[45px] shadow-2xl overflow-hidden min-h-[750px] bg-white/20 backdrop-blur-md">
+        
+        {/* Left Side: Transparent/Glass */}
+        <div className="hidden lg:block w-[40%] bg-transparent relative">
+          {/* Glassmorphism effect is handled by parent backdrop-blur */}
+        </div>
+        
+        {/* Right Side: Form Content */}
+        <div className="w-full lg:w-[60%] bg-[radial-gradient(198.87%_100%_at_50%_0%,#091413_0%,#408A71_100%)] p-10 md:p-16 flex flex-col justify-center items-center relative shadow-[-10px_0_20px_rgba(0,0,0,0.1)] rounded-[45px] lg:rounded-l-[45px] border-l border-white/10">
+          
+          <h1 className="text-[#FBF8F3] font-sans text-[48px] font-bold tracking-[0.15em] text-center mb-10">
             Login
-          </p>
-          <div className="w-[560px] h-[88px] relative">
-            <p className="text-[#FBF8F3] font-roboto text-xl font-bold leading-[0.908em] w-[418px] h-6 absolute left-[3px] top-0 tracking-[0.15em]">
-              Username
-            </p>
-            <svg
-              width="560"
-              height="56"
-              viewBox="0 0 560 56"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-[560px] h-14 absolute left-0 top-8 "
-            >
-              <path
-                d="M0 10C0 4.47715 4.47715 0 10 0H550C555.523 0 560 4.47715 560 10V46C560 51.5229 555.523 56 550 56H10C4.47715 56 0 51.5228 0 46V10Z"
-                fill="#D9D9D9"
-              />
-            </svg>
-          </div>
-          <div className="flex flex-col items-start gap-[5px] w-[560px]">
-            <p className="text-[#FBF8F3] font-roboto text-xl font-bold leading-[0.908em] w-full h-6 tracking-[0.15em]">
-              Email
-            </p>
-            <svg
-              width="560"
-              height="56"
-              viewBox="0 0 560 56"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-[560px] h-14 "
-            >
-              <path
-                d="M0 10C0 4.47715 4.47715 0 10 0H550C555.523 0 560 4.47715 560 10V46C560 51.5229 555.523 56 550 56H10C4.47715 56 0 51.5228 0 46V10Z"
-                fill="#D9D9D9"
-              />
-            </svg>
-          </div>
-          <div className="flex flex-col items-start gap-[5px] w-[560px]">
-            <p className="text-[#FBF8F3] font-roboto text-xl font-bold leading-[0.908em] w-full h-6 tracking-[0.15em]">
-              Password
-            </p>
-            <div className="flex py-[7px] px-[9px] justify-end items-center gap-2.5 rounded-[10px] bg-[#D9D9D9] w-full h-14">
-              <img
-                src="/ShowIcon.png"
-                className="w-[41px] h-[42px] max-w-none"
-                alt="Show Icon"
+          </h1>
+          
+          <form className="w-full max-w-[480px] flex flex-col gap-6">
+            
+            {/* Username */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
+                Username
+              </label>
+              <input 
+                type="text" 
+                className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
               />
             </div>
-          </div>
-          <div className="w-[560px] h-20 relative">
-            <p className="text-[#FBF8F3] font-roboto text-xl font-bold leading-[0.908em] w-[418px] h-6 absolute left-[3px] top-0 tracking-[0.15em]">
-              Confirm Password
-            </p>
-            <svg
-              width="560"
-              height="56"
-              viewBox="0 0 560 56"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-[560px] h-14 absolute left-0 top-6 "
-            >
-              <path
-                d="M0 10C0 4.47715 4.47715 0 10 0H550C555.523 0 560 4.47715 560 10V46C560 51.5229 555.523 56 550 56H10C4.47715 56 0 51.5228 0 46V10Z"
-                fill="#D9D9D9"
+            
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
+                Email
+              </label>
+              <input 
+                type="email" 
+                className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
               />
-            </svg>
-            <img
-              src="/ShowIcon(1).png"
-              className="w-[41px] h-[42px] absolute left-[551px] top-[31px] max-w-none"
-              alt="Show Icon"
-            />
-          </div>
-          <div className="w-[301px] h-14 relative">
-            <svg
-              width="300"
-              height="56"
-              viewBox="0 0 300 56"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-[300px] h-14 absolute left-px top-0 "
-            >
-              <path
-                d="M0 10C0 4.47715 4.47715 0 10 0H290C295.523 0 300 4.47715 300 10V46C300 51.5229 295.523 56 290 56H10C4.47716 56 0 51.5228 0 46V10Z"
-                fill="#B0E4CC"
-              />
-            </svg>
-            <p className="flex flex-col justify-center text-[#FBF8F3] font-roboto text-4xl font-bold leading-[0.908em] w-[300px] h-14 absolute left-0 top-0 text-center tracking-[0.15em]">
-              Login
-            </p>
-          </div>
-          <p className="text-[#004DFF] font-roboto text-base font-bold w-80">
-            Don’t have an Account? Register here Having trouble? Help
-          </p>
+            </div>
+            
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
+                Password
+              </label>
+              <div className="relative w-full">
+                <input 
+                  type="password" 
+                  className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 pr-14 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
+                />
+                <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 hover:text-gray-800 transition-colors"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Confirm Password */}
+            <div className="flex flex-col gap-2 mb-4">
+              <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
+                Confirm Password
+              </label>
+              <div className="relative w-full">
+                <input 
+                  type="password" 
+                  className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 pr-14 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
+                />
+                <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 hover:text-gray-800 transition-colors"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="flex justify-center mt-2">
+              <button 
+                type="button" 
+                onClick={() => navigate('/admin')}
+                className="w-[300px] h-14 bg-secondary rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-sans text-3xl font-bold tracking-[0.15em] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] hover:bg-secondary-hover transition-all active:scale-95 cursor-pointer"
+                style={{ textShadow: "0px 2px 4px rgba(0,0,0,0.3)" }}
+              >
+                Login
+              </button>
+            </div>
+            
+            {/* Footer Text */}
+            <div className="mt-6 text-center">
+              <p className="text-[#004DFF] font-sans text-base font-bold">
+                Don’t have an Account? <Link to="/register" className="hover:underline">Register here</Link><br/>
+                Having trouble? <a href="#" className="hover:underline">Help</a>
+              </p>
+            </div>
+            
+          </form>
         </div>
       </div>
     </AuthBackground>

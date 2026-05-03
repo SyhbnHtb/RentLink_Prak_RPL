@@ -3,283 +3,129 @@ import AdminLayout from "../components/AdminLayout";
 export default function GroupUser() {
   return (
     <AdminLayout title="Selamat Datang Kembali, Nasir!">
-          <div className="flex items-start gap-[31px] w-full">
-            <div className="flex flex-col items-start gap-[15px] w-full">
-              <div className="grid w-full h-[120px]">
-                <div className="flex py-[22px] px-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#7A9CB8] font-plusJakartaSans text-[17px] font-medium w-full tracking-[0.04em]">
-                      Status Pembayaran
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start w-full">
-                    <button className="cursor-pointer text-nowrap flex py-1 px-3 justify-center items-center gap-2.5 rounded-xl bg-[#1A7A45] w-fit">
-                      <p className="text-[#FFF] font-roboto text-xl w-fit">
-                        Approved
-                      </p>
-                    </button>
-                  </div>
-                </div>
-                <div className="flex pt-[22px] pr-[25px] pb-[29px] pl-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#7A9CB8] font-plusJakartaSans text-[17px] font-medium w-full tracking-[0.04em]">
-                      TOTAL TAGIHAN
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#1E3549] font-sora text-[28px] font-semibold w-full">
-                      Rp 2.055.216,-
-                    </p>
-                  </div>
-                </div>
-                <div className="flex pt-[22px] pr-[25px] pb-[29px] pl-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#7A9CB8] font-plusJakartaSans text-[17px] font-medium w-full tracking-[0.04em]">
-                      Tagihan Aktif
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#1E3549] font-sora text-[28px] font-semibold w-full">
-                      INV-001
-                    </p>
-                  </div>
-                </div>
-                <div className="flex pt-[22px] pr-[25px] pb-[29px] pl-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#7A9CB8] font-plusJakartaSans text-[17px] font-medium w-full tracking-[0.04em]">
-                      Unit
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#1E3549] font-sora text-[28px] font-semibold w-full">
-                      Kamar 102
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-start w-full">
-                <div className="flex py-1 px-0 flex-col items-start w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#1E3549] font-plusJakartaSans text-[22px] font-semibold w-full">
-                      Ringkasan Pembayaran
-                    </p>
-                  </div>
-                </div>
-                <div className="flex pt-7 pr-[31px] pb-7 pl-[31px] flex-col justify-center items-center rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex items-start rounded-xl bg-[#F9FAFB] w-full h-[72px] overflow-hidden">
-                    <div className="flex flex-col items-start w-[200px] h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          ID Invoice
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          INV-001
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-full h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Nama Unit
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          Kamar 102
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-40 h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Lantai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          1
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[180px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-60 h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Tanggal Mulai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 shrink-0 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-60 h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          1 April 2026
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[180px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-60 h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Tanggal Selesai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 shrink-0 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          11 April 2026
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[200px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Status
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <button className="cursor-pointer text-nowrap flex py-1 px-3 justify-center items-center gap-2.5 rounded-xl bg-[#8F8383] w-fit">
-                          <p className="text-[#FFF] font-roboto text-xl w-fit">
-                            Selesai
-                          </p>
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start rounded-[20px] w-[200px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Actions
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#F9FAFB] w-full h-10">
-                        <div className="flex py-1 px-2 items-center gap-1 rounded-xl w-fit">
-                          <p className="text-[#285A48] font-roboto text-xl w-fit">
-                            Detail
-                          </p>
-                        </div>
-                        <div className="flex py-1 px-2 items-center gap-1 rounded-xl w-fit">
-                          <p className="text-[#3B82F6] font-roboto text-xl w-fit">
-                            Bayar
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-start w-full">
-                <div className="flex py-1 px-0 flex-col items-start w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <p className="text-[#1E3549] font-plusJakartaSans text-[22px] font-semibold w-full">
-                      Riwayat Pembayaran
-                    </p>
-                  </div>
-                </div>
-                <div className="flex pt-7 pr-[31px] pb-7 pl-[31px] flex-col items-start rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] shadow-[04px4px0rgba(0,0,0,0.25)] w-full">
-                  <div className="flex items-start rounded-xl bg-[#F9FAFB] w-full h-[72px] overflow-hidden">
-                    <div className="flex flex-col items-start w-[200px] h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          ID Invoice
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          INV-001
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-full h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Nama Unit
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          Kamar 102
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-40 h-full">
-                      <div className="flex py-2 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Lantai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          1
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[180px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-60 h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Tanggal Mulai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 shrink-0 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-60 h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          1 April 2026
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[180px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-60 h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Tanggal Selesai
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 shrink-0 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <p className="text-[#285A48] font-roboto text-xl w-fit">
-                          11 April 2026
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start w-[200px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Status
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 items-center gap-3 border-b border-b-[#D9EBFE] bg-[#F3F8FF] w-full h-10">
-                        <button className="cursor-pointer text-nowrap flex py-1 px-3 justify-center items-center gap-2.5 rounded-xl bg-[#8F8383] w-fit">
-                          <p className="text-[#FFF] font-roboto text-xl w-fit">
-                            Selesai
-                          </p>
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start rounded-[20px] w-[200px] h-full">
-                      <div className="flex py-2 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#285A48] w-full h-8">
-                        <p className="text-[#F3F8FF] font-roboto text-xl font-medium w-fit">
-                          Actions
-                        </p>
-                        <div className="flex flex-col justify-center items-center gap-0.5 w-fit h-4"></div>
-                      </div>
-                      <div className="flex py-0 px-5 justify-between items-center border-b border-b-[#D9EBFE] bg-[#F9FAFB] w-full h-10">
-                        <div className="flex py-1 px-2 items-center gap-1 rounded-xl w-fit">
-                          <p className="text-[#285A48] font-roboto text-xl w-fit">
-                            Detail
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div className="flex flex-col gap-10 w-full max-w-7xl">
+        
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
+          
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
+            <p className="text-gray-500 font-sans text-sm md:text-base font-medium uppercase tracking-wider">
+              Status Pembayaran
+            </p>
+            <div className="mt-1">
+              <span className="bg-success text-white px-4 py-2 rounded-full text-base font-bold">Approved</span>
             </div>
           </div>
+
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
+            <p className="text-gray-500 font-sans text-sm md:text-base font-medium uppercase tracking-wider">
+              Total Tagihan
+            </p>
+            <p className="text-gray-900 font-sans text-3xl font-bold">
+              Rp 2.055.216,-
+            </p>
+          </div>
+
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
+            <p className="text-gray-500 font-sans text-sm md:text-base font-medium uppercase tracking-wider">
+              Tagihan Aktif
+            </p>
+            <p className="text-gray-900 font-sans text-3xl font-bold">
+              INV-001
+            </p>
+          </div>
+
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
+            <p className="text-gray-500 font-sans text-sm md:text-base font-medium uppercase tracking-wider">
+              Unit
+            </p>
+            <p className="text-gray-900 font-sans text-3xl font-bold">
+              Kamar 102
+            </p>
+          </div>
+
+        </div>
+
+        {/* Ringkasan Pembayaran */}
+        <div className="flex flex-col gap-4 w-full">
+          <h2 className="text-gray-900 font-sans text-2xl font-bold">
+            Ringkasan Pembayaran
+          </h2>
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-primary text-white font-sans text-lg">
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Nama Unit</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Lantai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="font-sans text-base">
+                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-6 text-gray-800">INV-001</td>
+                    <td className="py-4 px-6 text-gray-800">Kamar 102</td>
+                    <td className="py-4 px-6 text-gray-800">1</td>
+                    <td className="py-4 px-6 text-gray-800">1 April 2026</td>
+                    <td className="py-4 px-6 text-gray-800">11 April 2026</td>
+                    <td className="py-4 px-6">
+                      <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">Selesai</span>
+                    </td>
+                    <td className="py-4 px-6 text-center space-x-4">
+                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                      <button className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Bayar</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Riwayat Pembayaran */}
+        <div className="flex flex-col gap-4 w-full">
+          <h2 className="text-gray-900 font-sans text-2xl font-bold">
+            Riwayat Pembayaran
+          </h2>
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-primary text-white font-sans text-lg">
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Nama Unit</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Lantai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="font-sans text-base">
+                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-6 text-gray-800">INV-001</td>
+                    <td className="py-4 px-6 text-gray-800">Kamar 102</td>
+                    <td className="py-4 px-6 text-gray-800">1</td>
+                    <td className="py-4 px-6 text-gray-800">1 April 2026</td>
+                    <td className="py-4 px-6 text-gray-800">11 April 2026</td>
+                    <td className="py-4 px-6">
+                      <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">Selesai</span>
+                    </td>
+                    <td className="py-4 px-6 text-center space-x-4">
+                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </AdminLayout>
   );
 }

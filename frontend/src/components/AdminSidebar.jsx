@@ -3,7 +3,6 @@ import { PersonIcon, DashboardIcon, DocumentIcon } from "./icons";
 
 /**
  * Menu items untuk sidebar admin.
- * `icon` menentukan jenis ikon yang dipakai.
  */
 const MENU_ITEMS = [
   {
@@ -40,13 +39,6 @@ const MENU_ITEMS = [
 
 /**
  * AdminSidebar
- *
- * Sidebar navigasi untuk semua halaman admin.
- * Menu yang aktif ditentukan otomatis berdasarkan URL saat ini (useLocation).
- *
- * Props:
- * - `userName`  – nama atau email yang ditampilkan di profil (opsional)
- * - `onLogout`  – fungsi yang dipanggil saat tombol Logout ditekan (opsional)
  */
 export default function AdminSidebar({
   userName = "XianyinksDelEsol User_Email@ddress",
@@ -55,22 +47,22 @@ export default function AdminSidebar({
   const location = useLocation();
 
   return (
-    <div className="flex min-h-[926.112px] flex-col items-start bg-linear-[180deg,#285A480%,#091413100%] w-[340px] h-full absolute left-0 top-0">
+    <aside className="w-[300px] lg:w-[320px] shrink-0 min-h-screen bg-primary flex flex-col shadow-xl z-20">
       {/* ── Header: judul dashboard ── */}
-      <div className="flex pt-[43px] pr-[37px] pb-[31px] pl-[37px] flex-col items-start w-full">
-        <p className="text-[#FFF] font-sora text-[31px] font-semibold w-full tracking-[0.01em]">
+      <div className="px-10 py-10">
+        <h2 className="text-white font-sans text-3xl font-bold tracking-wider">
           Dashboard
-        </p>
+        </h2>
       </div>
 
       {/* ── Profil user ── */}
-      <div className="flex py-0 px-3 flex-col items-start w-full">
-        <div className="flex pt-[19px] pr-[25px] pb-[31px] pl-[25px] items-center gap-[15px] border-b-[1.54px] border-b-[rgba(255,255,255,0.12)] w-full">
-          <div className="flex justify-center items-center rounded-[29.3px] bg-[#408A71] w-[59px] h-[59px]">
-            <PersonIcon size={31} fill="#B0E4CC" />
+      <div className="px-6 mb-8">
+        <div className="flex items-center gap-4 pb-6 border-b border-white/20">
+          <div className="flex justify-center items-center rounded-full bg-secondary/80 w-14 h-14 shrink-0">
+            <PersonIcon size={31} fill="#ffffff" />
           </div>
-          <div className="flex flex-col items-start w-fit">
-            <p className="text-[#408A71] font-plusJakartaSans text-[15px] w-fit">
+          <div className="flex flex-col min-w-0">
+            <p className="text-secondary font-sans text-sm md:text-base truncate">
               {userName}
             </p>
           </div>
@@ -78,52 +70,52 @@ export default function AdminSidebar({
       </div>
 
       {/* ── Menu navigasi ── */}
-      <div className="flex py-[25px] px-3 flex-col items-start gap-1.5 w-[340px]">
+      <nav className="flex-1 px-6 space-y-2 overflow-y-auto">
         {MENU_ITEMS.map((item) => {
           const isActive = location.pathname === item.path;
-          const iconFill = isActive ? "#B0E4CC" : "#B0E4CC";
-          const iconOpacity = isActive ? undefined : 0.7;
-          const textColor = isActive
-            ? "text-[#B0E4CC]"
-            : "text-[rgba(176,228,204,0.70)]";
-          const bgActive = isActive ? "bg-[rgba(255,255,255,0.10)]" : "";
-
+          
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex py-[15px] px-[25px] items-center gap-[15px] rounded-[12.3px] w-full ${bgActive}`}
+              className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-colors ${
+                isActive 
+                  ? "bg-white/10 text-secondary" 
+                  : "text-secondary/70 hover:bg-white/5 hover:text-secondary"
+              }`}
             >
               {item.icon === "dashboard" ? (
                 <DashboardIcon
-                  size={25}
-                  fill={iconFill}
-                  fillOpacity={iconOpacity}
+                  size={24}
+                  fill={isActive ? "#B0E4CC" : "#B0E4CC"}
+                  fillOpacity={isActive ? undefined : 0.7}
                 />
               ) : (
                 <DocumentIcon
-                  size={25}
-                  fill={iconFill}
-                  fillOpacity={iconOpacity}
+                  size={24}
+                  fill={isActive ? "#B0E4CC" : "#B0E4CC"}
+                  fillOpacity={isActive ? undefined : 0.7}
                 />
               )}
-              <p className={`${textColor} font-plusJakartaSans text-xl font-medium w-fit`}>
+              <span className="font-sans text-lg font-medium">
                 {item.label}
-              </p>
+              </span>
             </Link>
           );
         })}
+      </nav>
 
-        {/* ── Tombol Logout ── */}
+      {/* ── Tombol Logout ── */}
+      <div className="p-6 mb-4 mt-auto">
         <button
           onClick={onLogout}
-          className="cursor-pointer text-nowrap flex py-[9px] px-[22px] flex-col justify-center items-center rounded-[30.9px] border-[1.54px] border-[rgba(255,255,255,0.35)] bg-[rgba(255,255,255,0.22)] w-[315px] mt-2"
+          className="w-full flex justify-center items-center py-4 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors shadow-sm cursor-pointer"
         >
-          <p className="text-[#FFF] font-arial text-xl font-bold w-fit">
+          <span className="text-white font-sans text-xl font-bold">
             Logout
-          </p>
+          </span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
