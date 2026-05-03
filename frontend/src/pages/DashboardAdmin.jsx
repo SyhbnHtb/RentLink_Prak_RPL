@@ -2,12 +2,12 @@ import AdminLayout from "../components/AdminLayout";
 
 export default function DashboardAdmin() {
   return (
-    <AdminLayout title="Selamat Datang Kembali, Xianyinks!">
+    <AdminLayout title="Selamat Datang Kembali, Admin!">
       <div className="flex flex-col gap-10 w-full max-w-7xl">
-        
+
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
-          
+
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
             <p className="text-gray-500 font-sans text-sm md:text-base font-medium uppercase tracking-wider">
               Total Unit Tersedia

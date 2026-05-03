@@ -1,8 +1,46 @@
 import AdminLayout from "../components/AdminLayout";
+import StatusBadge from "../components/StatusBadge";
+import { useAuth } from "../contexts/AuthContext";
+import { MOCK_TAGIHAN, MOCK_KONTRAK } from "../utils/mockData";
 
 export default function GroupUser() {
+  const { user } = useAuth();
+  const userName = user?.name || "Nasir";
+
+  // Filter data for the specific user
+  const userTagihan = MOCK_TAGIHAN.filter(t => t.penyewa === userName);
+  const userKontrak = MOCK_KONTRAK.filter(k => k.penyewa === userName);
+
+  // Stats calculations
+  const tagihanAktif = userTagihan.filter(t => t.status === "Belum Bayar" || t.status === "Menunggu Konfirmasi")[0];
+  const totalTagihanValue = tagihanAktif ? tagihanAktif.total : 0;
+  const statusPembayaran = tagihanAktif ? tagihanAktif.status : "Approved";
+  const activeUnit = userKontrak.find(k => k.status === "Aktif")?.namaUnit || "-";
+
+  const formatRupiah = (number) => {
+    if (number === null || number === undefined) return "Rp -";
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(number);
+  };
+
+  const formatTanggal = (dateString) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+  };
+
+  const activeTagihanList = userTagihan.filter(t => t.status !== "Approved" && t.status !== "Selesai");
+  const riwayatTagihanList = userTagihan.filter(t => t.status === "Approved" || t.status === "Selesai");
+
   return (
-    <AdminLayout title="Selamat Datang Kembali, Nasir!">
+    <AdminLayout title={`Selamat Datang Kembali, ${userName}!`}>
       <div className="flex flex-col gap-10 w-full max-w-7xl">
         
         {/* Stat Cards */}
@@ -13,7 +51,7 @@ export default function GroupUser() {
               Status Pembayaran
             </p>
             <div className="mt-1">
-              <span className="bg-success text-white px-4 py-2 rounded-full text-base font-bold">Approved</span>
+              <StatusBadge variant={statusPembayaran} />
             </div>
           </div>
 
@@ -22,7 +60,7 @@ export default function GroupUser() {
               Total Tagihan
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
-              Rp 2.055.216,-
+              {formatRupiah(totalTagihanValue)}
             </p>
           </div>
 
@@ -31,7 +69,7 @@ export default function GroupUser() {
               Tagihan Aktif
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
-              INV-001
+              {tagihanAktif ? tagihanAktif.id : "-"}
             </p>
           </div>
 
@@ -40,7 +78,7 @@ export default function GroupUser() {
               Unit
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
-              Kamar 102
+              {activeUnit}
             </p>
           </div>
 
@@ -49,7 +87,7 @@ export default function GroupUser() {
         {/* Ringkasan Pembayaran */}
         <div className="flex flex-col gap-4 w-full">
           <h2 className="text-gray-900 font-sans text-2xl font-bold">
-            Ringkasan Pembayaran
+            Tagihan Aktif
           </h2>
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
             <div className="overflow-x-auto">
@@ -58,28 +96,32 @@ export default function GroupUser() {
                   <tr className="bg-primary text-white font-sans text-lg">
                     <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Nama Unit</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Lantai</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Total Tagihan</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="font-sans text-base">
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6 text-gray-800">INV-001</td>
-                    <td className="py-4 px-6 text-gray-800">Kamar 102</td>
-                    <td className="py-4 px-6 text-gray-800">1</td>
-                    <td className="py-4 px-6 text-gray-800">1 April 2026</td>
-                    <td className="py-4 px-6 text-gray-800">11 April 2026</td>
-                    <td className="py-4 px-6">
-                      <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">Selesai</span>
-                    </td>
-                    <td className="py-4 px-6 text-center space-x-4">
-                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
-                      <button className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Bayar</button>
-                    </td>
-                  </tr>
+                  {activeTagihanList.length > 0 ? activeTagihanList.map((tagihan, index) => (
+                    <tr key={tagihan.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}`}>
+                      <td className="py-4 px-6 text-gray-800">{tagihan.id}</td>
+                      <td className="py-4 px-6 text-gray-800">{tagihan.namaUnit}</td>
+                      <td className="py-4 px-6 text-gray-800">{formatRupiah(tagihan.total)}</td>
+                      <td className="py-4 px-6">
+                        <StatusBadge variant={tagihan.status} />
+                      </td>
+                      <td className="py-4 px-6 text-center space-x-4">
+                        <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                        {tagihan.status === "Belum Bayar" && (
+                          <button className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Bayar</button>
+                        )}
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="5" className="py-6 text-center text-gray-500">Tidak ada tagihan aktif.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -98,27 +140,31 @@ export default function GroupUser() {
                   <tr className="bg-primary text-white font-sans text-lg">
                     <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Nama Unit</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Lantai</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Dibayar</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Total</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="font-sans text-base">
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6 text-gray-800">INV-001</td>
-                    <td className="py-4 px-6 text-gray-800">Kamar 102</td>
-                    <td className="py-4 px-6 text-gray-800">1</td>
-                    <td className="py-4 px-6 text-gray-800">1 April 2026</td>
-                    <td className="py-4 px-6 text-gray-800">11 April 2026</td>
-                    <td className="py-4 px-6">
-                      <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium">Selesai</span>
-                    </td>
-                    <td className="py-4 px-6 text-center space-x-4">
-                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
-                    </td>
-                  </tr>
+                  {riwayatTagihanList.length > 0 ? riwayatTagihanList.map((riwayat, index) => (
+                    <tr key={riwayat.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}`}>
+                      <td className="py-4 px-6 text-gray-800">{riwayat.id}</td>
+                      <td className="py-4 px-6 text-gray-800">{riwayat.namaUnit}</td>
+                      <td className="py-4 px-6 text-gray-800">{formatTanggal(riwayat.tglDibayar)}</td>
+                      <td className="py-4 px-6 text-gray-800">{formatRupiah(riwayat.total)}</td>
+                      <td className="py-4 px-6">
+                        <StatusBadge variant="Selesai" />
+                      </td>
+                      <td className="py-4 px-6 text-center space-x-4">
+                        <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="6" className="py-6 text-center text-gray-500">Belum ada riwayat pembayaran.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

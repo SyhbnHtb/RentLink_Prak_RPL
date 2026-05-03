@@ -1,6 +1,38 @@
 import AuthBackground from "../components/AuthBackground";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function VerificationPage() {
+  const navigate = useNavigate();
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const inputRefs = useRef([]);
+
+  const handleChange = (index, value) => {
+    if (isNaN(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus to next input
+    if (value !== "" && index < 5) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    // Backspace: clear current and auto-focus previous
+    if (e.key === "Backspace") {
+      if (otp[index] === "" && index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
+    }
+  };
+
+  const handleVerify = () => {
+    // Navigate to login after successful verification
+    navigate("/login");
+  };
+
   return (
     <AuthBackground>
       {/* Main Card Container */}
@@ -26,11 +58,15 @@ export default function VerificationPage() {
             
             {/* OTP Inputs */}
             <div className="flex justify-center items-center gap-2 md:gap-4 mb-12 w-full">
-              {[0, 1, 2, 3, 4, 5].map((index) => (
+              {otp.map((digit, index) => (
                 <input 
                   key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
                   type="text" 
                   maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
                   className="w-10 h-14 md:w-14 md:h-16 bg-[#D9D9D9] rounded-[10px] text-center text-black text-2xl font-bold outline-none focus:ring-2 focus:ring-[#B0E4CC]"
                 />
               ))}
@@ -40,7 +76,8 @@ export default function VerificationPage() {
             <div className="w-full flex justify-center mb-8">
               <button 
                 type="button" 
-                className="w-[300px] h-14 bg-[#B0E4CC] rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-roboto text-3xl font-bold tracking-[0.15em] shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:bg-[#8ecba9] transition-colors"
+                onClick={handleVerify}
+                className="w-[300px] h-14 bg-[#B0E4CC] rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-roboto text-3xl font-bold tracking-[0.15em] shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:bg-[#8ecba9] transition-colors cursor-pointer"
                 style={{ textShadow: "0px 2px 4px rgba(0,0,0,0.3)" }}
               >
                 Verify
