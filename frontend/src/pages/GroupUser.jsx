@@ -1,7 +1,8 @@
-import AdminLayout from "../components/AdminLayout";
+import UserLayout from "../components/UserLayout";
 import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../contexts/AuthContext";
 import { MOCK_TAGIHAN, MOCK_KONTRAK } from "../utils/mockData";
+
 
 export default function GroupUser() {
   const { user } = useAuth();
@@ -40,7 +41,7 @@ export default function GroupUser() {
   const riwayatTagihanList = userTagihan.filter(t => t.status === "Approved" || t.status === "Selesai");
 
   return (
-    <AdminLayout title={`Selamat Datang Kembali, ${userName}!`}>
+    <UserLayout title={`Selamat Datang Kembali, ${userName}!`}>
       <div className="flex flex-col gap-10 w-full max-w-7xl">
         
         {/* Stat Cards */}
@@ -172,6 +173,6 @@ export default function GroupUser() {
         </div>
 
       </div>
-    </AdminLayout>
+    </UserLayout>
   );
 }

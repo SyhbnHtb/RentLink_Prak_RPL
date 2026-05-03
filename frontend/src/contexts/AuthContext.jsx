@@ -21,27 +21,45 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
+// Daftar akun mock yang terdaftar
+const MOCK_ACCOUNTS = [
+  { username: "admin",  password: "admin123",  name: "Admin",  email: "admin@rentlink.com",  role: "admin" },
+  { username: "nasir",  password: "nasir123",  name: "Nasir",  email: "nasir@rentlink.com",  role: "user"  },
+  { username: "rusdi",  password: "rusdi123",  name: "Rusdi",  email: "rusdi@rentlink.com",  role: "user"  },
+];
+
   const login = async (username, password) => {
     // In the future, this will be an API call:
     // const response = await axios.post("/api/login", { username, password });
-    // setUser(response.data.user);
     
-    // Mock implementation
+    // Cari akun yang cocok dengan username dan password
+    const found = MOCK_ACCOUNTS.find(
+      (acc) =>
+        acc.username.toLowerCase() === username?.toLowerCase() &&
+        acc.password === password
+    );
+
+    if (!found) {
+      return { success: false, message: "Username atau password salah." };
+    }
+
     const mockUser = {
-      username: username || "Xianyinks",
-      name: "XianyinksDelEsol User_Email@ddress",
-      email: "user@example.com",
-      role: username?.toLowerCase() === "admin" ? "admin" : "user",
+      username: found.username,
+      name: found.name,
+      email: found.email,
+      role: found.role,
     };
-    
+
     setUser(mockUser);
     localStorage.setItem("rentlink_user", JSON.stringify(mockUser));
-    
+
     if (mockUser.role === "admin") {
       navigate("/admin");
     } else {
       navigate("/group-user");
     }
+
+    return { success: true };
   };
 
   const logout = () => {

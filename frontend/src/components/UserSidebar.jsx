@@ -49,6 +49,7 @@ const MENU_ITEMS = [
  */
 export default function UserSidebar({
   userName = "Nasir",
+  onLogout,
 }) {
   const location = useLocation();
 
@@ -111,6 +112,16 @@ export default function UserSidebar({
             </Link>
           );
         })}
+      </div>
+
+      {/* ── Tombol Logout ── */}
+      <div className="p-6 mb-4 mt-auto">
+        <button
+          onClick={onLogout}
+          className="w-full flex justify-center items-center py-4 rounded-full border border-white/40 bg-white/10 hover:bg-white/20 transition-colors shadow-sm cursor-pointer"
+        >
+          <span className="text-white font-sans text-xl font-bold">Logout</span>
+        </button>
       </div>
     </div>
   );
