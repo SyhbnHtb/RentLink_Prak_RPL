@@ -26,6 +26,11 @@ const MENU_ITEMS = [
     icon: "dashboard",
   },
   {
+    label: "Manajemen Penyewa",
+    path: "/admin/penyewa",
+    icon: "person",
+  },
+  {
     label: "Tagihan & Pembayaran",
     path: "/admin/tagihan",
     icon: "document",
@@ -33,6 +38,16 @@ const MENU_ITEMS = [
   {
     label: "Riwayat Transaksi",
     path: "/admin/riwayat",
+    icon: "document",
+  },
+  {
+    label: "Verifikasi Pembayaran",
+    path: "/admin/verifikasi",
+    icon: "document",
+  },
+  {
+    label: "Laporan Keuangan",
+    path: "/admin/laporan",
     icon: "document",
   },
 ];
@@ -57,16 +72,20 @@ export default function AdminSidebar({
 
       {/* ── Profil user ── */}
       <div className="px-6 mb-8">
-        <div className="flex items-center gap-4 pb-6 border-b border-white/20">
+        <Link 
+          to="/profil"
+          className="flex items-center gap-4 pb-6 border-b border-white/20 cursor-pointer hover:bg-white/5 rounded-2xl transition-colors p-2 -ml-2"
+        >
           <div className="flex justify-center items-center rounded-full bg-secondary/80 w-14 h-14 shrink-0">
             <PersonIcon size={31} fill="#ffffff" />
           </div>
           <div className="flex flex-col min-w-0">
-            <p className="text-secondary font-sans text-sm md:text-base truncate">
+            <p className="text-secondary font-sans text-sm md:text-base truncate font-semibold">
               {userName}
             </p>
+            <p className="text-secondary/60 font-sans text-xs">Lihat Profil</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* ── Menu navigasi ── */}
@@ -86,6 +105,12 @@ export default function AdminSidebar({
             >
               {item.icon === "dashboard" ? (
                 <DashboardIcon
+                  size={24}
+                  fill={isActive ? "#B0E4CC" : "#B0E4CC"}
+                  fillOpacity={isActive ? undefined : 0.7}
+                />
+              ) : item.icon === "person" ? (
+                <PersonIcon
                   size={24}
                   fill={isActive ? "#B0E4CC" : "#B0E4CC"}
                   fillOpacity={isActive ? undefined : 0.7}

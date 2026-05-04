@@ -1,6 +1,7 @@
 import AuthBackground from "../components/AuthBackground";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { register } from "../services/authService";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -10,11 +11,31 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Simulate register
-    navigate("/verification");
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Password dan Confirm Password tidak cocok.");
+      return;
+    }
+    if (!username || !email || !password) {
+      setError("Semua field harus diisi.");
+      return;
+    }
+
+    setLoading(true);
+    const result = await register({ username, email, password, confirmPassword });
+    setLoading(false);
+
+    if (result.success) {
+      navigate("/verification");
+    } else {
+      setError(result.message);
+    }
   };
 
   return (
@@ -113,12 +134,20 @@ export default function RegisterPage() {
                 </button>
               </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-500/20 border border-red-400/50 rounded-xl px-4 py-3 text-center">
+                <p className="text-red-200 font-sans font-semibold text-sm">{error}</p>
+              </div>
+            )}
             
             {/* Submit Button */}
             <div className="flex justify-center mt-2">
               <button 
-                type="submit" 
-                className="w-[300px] h-14 bg-secondary rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-sans text-3xl font-bold tracking-[0.15em] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] hover:bg-secondary-hover transition-all active:scale-95 cursor-pointer"
+                type="submit"
+                disabled={loading}
+                className="w-[300px] h-14 bg-secondary rounded-[10px] flex justify-center items-center text-[#FBF8F3] font-sans text-3xl font-bold tracking-[0.15em] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] hover:bg-secondary-hover transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                 style={{ textShadow: "0px 2px 4px rgba(0,0,0,0.3)" }}
               >
                 Register

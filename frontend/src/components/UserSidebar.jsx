@@ -21,6 +21,11 @@ const MENU_ITEMS = [
     icon: "document",
   },
   {
+    label: "Upload Bukti",
+    path: "/user/upload-bukti",
+    icon: "document",
+  },
+  {
     label: "Meteran",
     path: "/group-user/meteran",
     icon: "dashboard",
@@ -29,11 +34,6 @@ const MENU_ITEMS = [
     label: "Kontrak",
     path: "/group-user/kontrak",
     icon: "document",
-  },
-  {
-    label: "Biodata",
-    path: "/group-user/biodata",
-    icon: "dashboard",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function UserSidebar({
   const location = useLocation();
 
   return (
-    <div className="flex min-h-[926.112px] flex-col items-start bg-linear-[180deg,#285A480%,#091413100%] w-[340px] h-full absolute left-0 top-0">
+    <aside className="w-[300px] lg:w-[320px] shrink-0 min-h-screen flex flex-col bg-[radial-gradient(198.87%_100%_at_50%_0%,#091413_0%,#408A71_100%)] shadow-xl z-20">
       {/* ── Header: judul dashboard ── */}
       <div className="flex pt-[43px] pr-[37px] pb-[31px] pl-[37px] flex-col items-start w-full">
         <p className="text-[#FFF] font-sora text-[31px] font-semibold w-full tracking-[0.01em]">
@@ -63,21 +63,25 @@ export default function UserSidebar({
       </div>
 
       {/* ── Profil user ── */}
-      <div className="flex py-0 px-3 flex-col items-start w-full">
-        <div className="flex pt-[19px] pr-[25px] pb-[31px] pl-[25px] items-center gap-[15px] border-b-[1.54px] border-b-[rgba(255,255,255,0.12)] w-full">
-          <div className="flex justify-center items-center rounded-[29.3px] bg-[#408A71] w-[59px] h-[59px]">
+      <div className="px-6 mb-8">
+        <Link 
+          to="/profil"
+          className="flex items-center gap-4 pb-6 border-b border-white/20 cursor-pointer hover:bg-white/5 rounded-2xl transition-colors p-2 -ml-2"
+        >
+          <div className="flex justify-center items-center rounded-full bg-[#408A71] w-14 h-14 shrink-0">
             <PersonIcon size={31} fill="#B0E4CC" />
           </div>
-          <div className="flex flex-col items-start w-fit">
-            <p className="text-[#408A71] font-plusJakartaSans text-[15px] w-fit">
+          <div className="flex flex-col min-w-0">
+            <p className="text-[#408A71] font-plusJakartaSans text-sm md:text-base truncate font-semibold">
               {userName}
             </p>
+            <p className="text-[#408A71]/70 font-sans text-xs mt-0.5">Lihat Profil</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* ── Menu navigasi ── */}
-      <div className="flex py-[25px] px-3 flex-col items-start gap-1.5 w-[340px]">
+      <nav className="flex-1 px-6 space-y-2 overflow-y-auto">
         {MENU_ITEMS.map((item) => {
           const isActive = location.pathname === item.path;
           const iconFill = "#B0E4CC";
@@ -99,6 +103,12 @@ export default function UserSidebar({
                   fill={iconFill}
                   fillOpacity={iconOpacity}
                 />
+              ) : item.icon === "person" ? (
+                <PersonIcon
+                  size={25}
+                  fill={iconFill}
+                  fillOpacity={iconOpacity}
+                />
               ) : (
                 <DocumentIcon
                   size={25}
@@ -112,7 +122,7 @@ export default function UserSidebar({
             </Link>
           );
         })}
-      </div>
+      </nav>
 
       {/* ── Tombol Logout ── */}
       <div className="p-6 mb-4 mt-auto">
@@ -123,6 +133,6 @@ export default function UserSidebar({
           <span className="text-white font-sans text-xl font-bold">Logout</span>
         </button>
       </div>
-    </div>
+    </aside>
   );
 }
