@@ -11,18 +11,8 @@ const MENU_ITEMS = [
     icon: "dashboard",
   },
   {
-    label: "Tagihan",
+    label: "Tagihan & Riwayat",
     path: "/group-user/tagihan",
-    icon: "document",
-  },
-  {
-    label: "Riwayat Pembayaran",
-    path: "/group-user/riwayat",
-    icon: "document",
-  },
-  {
-    label: "Upload Bukti",
-    path: "/user/upload-bukti",
     icon: "document",
   },
   {

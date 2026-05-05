@@ -1,6 +1,7 @@
 import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
+import Modal from "../components/Modal";
 import { useState } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
 import { MOCK_TAGIHAN } from "../utils/mockData";
@@ -33,10 +34,10 @@ export default function RiwayatPembayaran() {
 
   return (
     <AdminLayout title="Riwayat Pembayaran">
-      <div className="flex flex-col xl:flex-row gap-8 w-full max-w-[1600px] items-start">
+      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start">
         
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col gap-8 w-full">
+        <div className="flex flex-col gap-8 w-full">
           
           {/* Top Filters */}
           <div className="flex flex-col md:flex-row gap-4 items-end w-full">
@@ -71,9 +72,9 @@ export default function RiwayatPembayaran() {
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
                 {isSortDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                    <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700" onClick={() => { handleSort("total"); setIsSortDropdownOpen(false); }}>Total Pembayaran</div>
-                    <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700" onClick={() => { handleSort("tglDibayar"); setIsSortDropdownOpen(false); }}>Tanggal Dibayar</div>
+                  <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-100 rounded-xl shadow-lg z-50 overflow-hidden">
+                    <div className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-700 font-sans font-medium" onClick={() => { handleSort("total"); setIsSortDropdownOpen(false); }}>Total Pembayaran</div>
+                    <div className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-700 font-sans font-medium" onClick={() => { handleSort("tglDibayar"); setIsSortDropdownOpen(false); }}>Tanggal Dibayar</div>
                   </div>
                 )}
               </div>
@@ -121,17 +122,19 @@ export default function RiwayatPembayaran() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Side Panel (Details & Actions) */}
+      {/* Detail Modal */}
+      <Modal isOpen={!!selectedRiwayat} onClose={() => setSelectedRiwayat(null)}>
         {selectedRiwayat && (
-          <div className="w-full xl:w-96 flex flex-col gap-6 shrink-0">
+          <div className="w-full flex flex-col gap-6 shrink-0">
             
             {/* Detail Card */}
-            <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-6 flex flex-col gap-6 relative">
+            <div className="bg-surface p-6 flex flex-col gap-6 relative">
               <button onClick={() => setSelectedRiwayat(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">×</button>
-              <h3 className="text-primary font-bold text-xl mb-2 mt-4">Detail Tagihan</h3>
+              <h2 className="text-2xl font-bold text-primary mb-0">Detail Tagihan</h2>
               
-              <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl">
+              <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl mt-2">
                 <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shrink-0">
                   <span className="text-secondary font-bold text-xl">{selectedRiwayat.penyewa.charAt(0).toUpperCase()}</span>
                 </div>
@@ -163,7 +166,7 @@ export default function RiwayatPembayaran() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1 mt-2">
+                <div className="flex flex-col gap-1 mt-2 border-t border-gray-100 pt-4">
                   <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Dibayar Pada</span>
                   <span className="text-primary font-bold text-lg">{formatTanggal(selectedRiwayat.tglDibayar)}</span>
                 </div>
@@ -176,7 +179,8 @@ export default function RiwayatPembayaran() {
 
           </div>
         )}
-      </div>
+      </Modal>
+
     </AdminLayout>
   );
 }

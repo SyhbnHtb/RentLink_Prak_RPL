@@ -156,7 +156,7 @@ export default function ManajemenKontrak() {
         {(actionType === "create" || actionType === "detail") && (
           <div className="w-full xl:w-96 flex flex-col gap-6 shrink-0">
             
-            {/* Detail Penyewa */}
+            {/* Detail Kontrak */}
             {actionType === "detail" && selectedKontrak && (
               <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-6 flex flex-col gap-4">
                 <div className="flex justify-between items-start mb-2">
@@ -172,27 +172,34 @@ export default function ManajemenKontrak() {
                   <button onClick={() => setActionType(null)} className="text-gray-400 hover:text-gray-600 mt-2">×</button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-2">
+                <div className="flex flex-col gap-3 mt-2">
                   <div className="flex flex-col gap-1">
-                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Email</span>
-                    <span className="text-primary font-semibold text-sm break-all">{selectedKontrak.penyewaDetail?.email}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Asal</span>
-                    <span className="text-primary font-semibold text-sm">{selectedKontrak.penyewaDetail?.asal}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">KTP</span>
-                    <span className="text-primary font-semibold text-sm">{selectedKontrak.penyewaDetail?.ktp}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Telepon</span>
-                    <span className="text-primary font-semibold text-sm">{selectedKontrak.penyewaDetail?.telp}</span>
+                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">ID Kontrak</span>
+                    <span className="text-primary font-semibold text-sm">{selectedKontrak.id}</span>
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Unit</span>
-                    <span className="text-primary font-semibold text-sm">{selectedKontrak.namaUnit}</span>
+                    <span className="text-primary font-semibold text-sm">{selectedKontrak.namaUnit} (Lantai {selectedKontrak.lantai})</span>
                   </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Mulai</span>
+                    <span className="text-primary font-semibold text-sm">{formatTanggal(selectedKontrak.tglMulai)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Selesai</span>
+                    <span className="text-primary font-semibold text-sm">{formatTanggal(selectedKontrak.tglSelesai)}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Status</span>
+                    <div className="mt-1">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${selectedKontrak.status === "Aktif" ? "bg-success" : "bg-gray-400"}`}>
+                        {selectedKontrak.status}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-xs mt-2">
+                    Untuk detail data pribadi penyewa, buka halaman <strong>Manajemen Penyewa</strong>.
+                  </p>
                 </div>
               </div>
             )}
