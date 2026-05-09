@@ -45,9 +45,9 @@ export default function StatusBadge({ variant, label, className = "" }) {
 
   return (
     <div
-      className={`flex py-1 px-3 justify-center items-center gap-2.5 rounded-xl w-fit ${bgColor} ${className}`}
+      className={`flex py-1.5 px-3 justify-center items-center gap-2 rounded-full w-fit ${bgColor} ${className}`}
     >
-      <p className="text-[#FFF] font-roboto text-xl w-fit m-0 leading-none">
+      <p className="text-[#FFF] font-sans text-sm font-medium w-fit m-0 leading-none tracking-wide">
         {displayLabel}
       </p>
     </div>

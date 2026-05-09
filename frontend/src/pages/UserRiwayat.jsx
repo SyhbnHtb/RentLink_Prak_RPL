@@ -1,5 +1,6 @@
 import UserLayout from "../components/UserLayout";
 import StatusBadge from "../components/StatusBadge";
+import Modal from "../components/Modal";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { MOCK_TAGIHAN } from "../utils/mockData";
@@ -38,9 +39,9 @@ export default function UserRiwayat() {
 
   return (
     <UserLayout title="Riwayat Pembayaran">
-      <div className="flex flex-col xl:flex-row gap-8 w-full max-w-[1600px] items-start">
+      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start">
         {/* Main Content */}
-        <div className="flex-1 flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-6 w-full">
           {/* Summary */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
@@ -141,102 +142,103 @@ export default function UserRiwayat() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Side Panel */}
+      {/* Modal Detail */}
+      <Modal isOpen={!!selectedRiwayat} onClose={() => setSelectedRiwayat(null)}>
         {selectedRiwayat && (
-          <div className="w-full xl:w-80 shrink-0">
-            <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-6 flex flex-col gap-5 relative">
-              <button
-                onClick={() => setSelectedRiwayat(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer leading-none"
-              >
-                ×
-              </button>
-              <h3 className="text-primary font-bold text-xl mt-2">
-                Detail Pembayaran
-              </h3>
+          <div className="bg-surface p-6 flex flex-col gap-5 relative">
+            <button
+              onClick={() => setSelectedRiwayat(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer leading-none"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-bold text-primary mb-0">
+              Detail Pembayaran
+            </h2>
 
-              <div className="flex items-center gap-3 bg-secondary/20 p-4 rounded-2xl">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shrink-0">
-                  <span className="text-secondary font-bold text-lg">
-                    {selectedRiwayat.namaUnit.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-primary font-bold">
-                    {selectedRiwayat.namaUnit}
-                  </p>
-                  <p className="text-primary/60 text-sm">
-                    {selectedRiwayat.bulan}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 font-medium">ID Invoice</span>
-                  <span className="text-gray-900 font-bold">
-                    {selectedRiwayat.id}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500 font-medium">
-                    Tanggal Dibayar
-                  </span>
-                  <span className="text-gray-900 font-semibold">
-                    {formatTanggal(selectedRiwayat.tglDibayar)}
-                  </span>
-                </div>
-                <hr className="border-gray-100" />
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Kamar</span>
-                  <span className="text-gray-900">
-                    {formatRupiah(selectedRiwayat.kamar)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Listrik</span>
-                  <span className="text-gray-900">
-                    {formatRupiah(selectedRiwayat.listrik)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Air</span>
-                  <span className="text-gray-900">
-                    {formatRupiah(selectedRiwayat.air)}
-                  </span>
-                </div>
-                <hr className="border-gray-100" />
-                <div className="flex justify-between font-bold text-base">
-                  <span className="text-primary">Total</span>
-                  <span className="text-primary">
-                    {formatRupiah(selectedRiwayat.total)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
-                <span className="text-green-700 font-medium text-sm">
-                  Pembayaran Selesai
+            <div className="flex items-center gap-3 bg-secondary/20 p-4 rounded-2xl mt-2">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shrink-0">
+                <span className="text-secondary font-bold text-lg">
+                  {selectedRiwayat.namaUnit.charAt(0)}
                 </span>
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
               </div>
+              <div>
+                <p className="text-primary font-bold">
+                  {selectedRiwayat.namaUnit}
+                </p>
+                <p className="text-primary/60 text-sm">
+                  {selectedRiwayat.bulan}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 font-medium">ID Invoice</span>
+                <span className="text-gray-900 font-bold">
+                  {selectedRiwayat.id}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 font-medium">
+                  Tanggal Dibayar
+                </span>
+                <span className="text-gray-900 font-semibold">
+                  {formatTanggal(selectedRiwayat.tglDibayar)}
+                </span>
+              </div>
+              <hr className="border-gray-100" />
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Kamar</span>
+                <span className="text-gray-900">
+                  {formatRupiah(selectedRiwayat.kamar)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Listrik</span>
+                <span className="text-gray-900">
+                  {formatRupiah(selectedRiwayat.listrik)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500">Air</span>
+                <span className="text-gray-900">
+                  {formatRupiah(selectedRiwayat.air)}
+                </span>
+              </div>
+              <hr className="border-gray-100" />
+              <div className="flex justify-between font-bold text-base">
+                <span className="text-primary">Total</span>
+                <span className="text-primary">
+                  {formatRupiah(selectedRiwayat.total)}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl mt-2">
+              <span className="text-green-700 font-medium text-sm">
+                Pembayaran Selesai
+              </span>
+              <svg
+                className="w-5 h-5 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
           </div>
         )}
-      </div>
+      </Modal>
+
     </UserLayout>
   );
 }

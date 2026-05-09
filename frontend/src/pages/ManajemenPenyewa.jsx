@@ -1,12 +1,32 @@
+import { useState } from "react";
 import AdminLayout from "../components/AdminLayout";
+import Modal from "../components/Modal";
 
+// Mock data penyewa untuk keperluan demo UI
+const MOCK_PENYEWA = [
+  { id: 1, nama: "Nasir", username: "nasir", email: "nasir@rentlink.com", ktp: "910216769", telepon: "0123456789", unit: "Kamar 102", status: "Aktif", asal: "Ngawi", tglMulai: "01/04/2026", tglSelesai: "11/04/2026" },
+  { id: 2, nama: "Rusdi", username: "rusdi", email: "rusdi@rentlink.com", ktp: "810315482", telepon: "0987654321", unit: "Kamar 201", status: "Aktif", asal: "Bandung", tglMulai: "01/05/2026", tglSelesai: "11/05/2026" },
+];
 export default function ManajemenPenyewa() {
+  const [selectedPenyewa, setSelectedPenyewa] = useState(null);
+  const [modalType, setModalType] = useState(null); // 'detail' or 'delete'
+
+  const openModal = (penyewa, type) => {
+    setSelectedPenyewa(penyewa);
+    setModalType(type);
+  };
+
+  const closeModal = () => {
+    setModalType(null);
+    setSelectedPenyewa(null);
+  };
+
   return (
     <AdminLayout title="Manajemen Penyewa">
-      <div className="flex flex-col xl:flex-row gap-8 w-full max-w-[1600px] items-start">
+      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start">
         
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col gap-8 w-full">
+        <div className="flex flex-col gap-8 w-full">
           
           {/* Top Filters */}
           <div className="flex flex-col md:flex-row gap-4 items-end w-full">
@@ -55,97 +75,99 @@ export default function ManajemenPenyewa() {
                   </tr>
                 </thead>
                 <tbody className="font-sans text-base">
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6 text-gray-800">Nasir</td>
-                    <td className="py-4 px-6 text-gray-800">nasir</td>
-                    <td className="py-4 px-6 text-gray-800">nasir@rentlink.com</td>
-                    <td className="py-4 px-6 text-gray-800">910216769</td>
-                    <td className="py-4 px-6 text-gray-800">0123456789</td>
-                    <td className="py-4 px-6 text-gray-800">Kamar 102</td>
-                    <td className="py-4 px-6">
-                      <span className="bg-success text-white px-3 py-1 rounded-full text-sm font-medium">Aktif</span>
-                    </td>
-                    <td className="py-4 px-6 text-center space-x-4">
-                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
-                      <button className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Hapus</button>
-                    </td>
-                  </tr>
-                  <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors bg-gray-50/50">
-                    <td className="py-4 px-6 text-gray-800">Rusdi</td>
-                    <td className="py-4 px-6 text-gray-800">rusdi</td>
-                    <td className="py-4 px-6 text-gray-800">rusdi@rentlink.com</td>
-                    <td className="py-4 px-6 text-gray-800">810315482</td>
-                    <td className="py-4 px-6 text-gray-800">0987654321</td>
-                    <td className="py-4 px-6 text-gray-800">Kamar 201</td>
-                    <td className="py-4 px-6">
-                      <span className="bg-success text-white px-3 py-1 rounded-full text-sm font-medium">Aktif</span>
-                    </td>
-                    <td className="py-4 px-6 text-center space-x-4">
-                      <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
-                      <button className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Hapus</button>
-                    </td>
-                  </tr>
+                  {MOCK_PENYEWA.map((penyewa, index) => (
+                    <tr key={penyewa.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}`}>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.nama}</td>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.username}</td>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.email}</td>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.ktp}</td>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.telepon}</td>
+                      <td className="py-4 px-6 text-gray-800">{penyewa.unit}</td>
+                      <td className="py-4 px-6">
+                        <span className="bg-success text-white px-3 py-1 rounded-full text-sm font-medium">{penyewa.status}</span>
+                      </td>
+                      <td className="py-4 px-6 text-center space-x-4">
+                        <button onClick={() => openModal(penyewa, 'detail')} className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                        <button onClick={() => openModal(penyewa, 'delete')} className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Hapus</button>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
 
-        {/* Side Panel — Detail Penyewa */}
-        <div className="w-full xl:w-96 flex flex-col gap-6 shrink-0">
-          
-          <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-6 flex flex-col gap-4">
+      </div>
+
+      {/* Detail Penyewa Modal */}
+      <Modal isOpen={modalType === 'detail'} onClose={closeModal}>
+        {selectedPenyewa && (
+          <div className="bg-surface p-6 flex flex-col gap-4 relative">
+            <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">×</button>
+            <h2 className="text-2xl font-bold text-primary mb-2">Detail Penyewa</h2>
+            
             <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl">
               <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shrink-0">
-                <span className="text-secondary font-bold text-xl">N</span>
+                <span className="text-secondary font-bold text-xl">{selectedPenyewa.nama.charAt(0).toUpperCase()}</span>
               </div>
               <div className="flex flex-col">
-                <h3 className="text-primary font-bold text-xl">Nasir</h3>
-                <p className="text-primary/70 text-sm font-bold">KingNasir</p>
+                <h3 className="text-primary font-bold text-xl">{selectedPenyewa.nama}</h3>
+                <p className="text-primary/70 text-sm font-bold">King{selectedPenyewa.nama}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Email</span>
-                <span className="text-primary font-semibold text-sm break-all">nasir@rentlink.com</span>
+                <span className="text-primary font-semibold text-sm break-all">{selectedPenyewa.email}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Asal</span>
-                <span className="text-primary font-semibold text-sm">Ngawi</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.asal}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">KTP</span>
-                <span className="text-primary font-semibold text-sm">910216769</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.ktp}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Telepon</span>
-                <span className="text-primary font-semibold text-sm">0123456789</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.telepon}</span>
               </div>
               <div className="flex flex-col gap-1 col-span-2">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Unit</span>
-                <span className="text-primary font-semibold text-sm">Kamar 102</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.unit}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Mulai</span>
-                <span className="text-primary font-semibold text-sm">01/04/2026</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.tglMulai}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Selesai</span>
-                <span className="text-primary font-semibold text-sm">11/04/2026</span>
+                <span className="text-primary font-semibold text-sm">{selectedPenyewa.tglSelesai}</span>
               </div>
             </div>
           </div>
+        )}
+      </Modal>
 
-          {/* Hapus Confirmation */}
-          <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-6 flex flex-col gap-3 text-center">
-            <p className="text-gray-800 font-bold text-lg mb-2">Hapus Penyewa?</p>
-            <button className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer">Hapus</button>
-            <button className="w-full py-3 bg-success hover:bg-green-700 text-white font-bold rounded-full transition-colors cursor-pointer">Batal</button>
+      {/* Hapus Confirmation Modal */}
+      <Modal isOpen={modalType === 'delete'} onClose={closeModal} className="max-w-sm mx-auto">
+        {selectedPenyewa && (
+          <div className="bg-surface p-6 flex flex-col gap-4 text-center relative">
+            <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">×</button>
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC3545" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+            </div>
+            <h2 className="text-gray-900 font-bold text-xl mb-1">Hapus Penyewa?</h2>
+            <p className="text-gray-500 text-sm mb-4">Anda yakin ingin menghapus <strong>{selectedPenyewa.nama}</strong>?</p>
+            <div className="flex flex-col gap-3 w-full">
+              <button onClick={closeModal} className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer">Ya, Hapus</button>
+              <button onClick={closeModal} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer">Batal</button>
+            </div>
           </div>
-
-        </div>
-      </div>
+        )}
+      </Modal>
     </AdminLayout>
   );
 }

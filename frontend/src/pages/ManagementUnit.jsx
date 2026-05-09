@@ -113,7 +113,7 @@ export default function ManagementUnit() {
             {/* Tambah Unit Button */}
             <button 
               onClick={handleCreateClick}
-              className="w-full md:w-auto h-full min-h-[96px] px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group"
+              className="w-full md:w-auto h-full py-4 px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group"
             >
               <span className="text-primary font-sans text-xl font-bold group-hover:scale-105 transition-transform">+ Tambah Unit</span>
             </button>

@@ -17,7 +17,10 @@ export const MOCK_METERAN = [
 
 export const MOCK_TAGIHAN = [
   { id: "INV-001", idUnit: "U-003", namaUnit: "Kamar 201", penyewa: "Rusdi", tglDibayar: null, total: 1400000, status: "Belum Bayar", bulan: "September", periode: 7, kamar: 1400000, listrik: 0, air: 0 },
-  { id: "INV-002", idUnit: "U-002", namaUnit: "Kamar 102", penyewa: "Nasir", tglDibayar: "2026-04-07", total: 2055216, status: "Approved", bulan: "April", periode: 10, kamar: 2000000, listrik: 20216, air: 35000 },
+  { id: "INV-002", idUnit: "U-002", namaUnit: "Kamar 102", penyewa: "Nasir", tglDibayar: "2026-04-07", total: 2055216, status: "Selesai", bulan: "April", periode: 10, kamar: 2000000, listrik: 20216, air: 35000 },
+  { id: "INV-003", idUnit: "U-002", namaUnit: "Kamar 102", penyewa: "Nasir", tglDibayar: null, total: 2150000, status: "Belum Bayar", bulan: "Mei", periode: 30, kamar: 2000000, listrik: 50000, air: 100000 },
+  { id: "INV-004", idUnit: "U-002", namaUnit: "Kamar 102", penyewa: "Nasir", tglDibayar: "2026-05-02", total: 2100000, status: "Menunggu Konfirmasi", bulan: "Juni", periode: 30, kamar: 2000000, listrik: 40000, air: 60000 },
+  { id: "INV-005", idUnit: "U-002", namaUnit: "Kamar 102", penyewa: "Nasir", tglDibayar: "2026-06-05", total: 2080000, status: "Approved", bulan: "Juli", periode: 30, kamar: 2000000, listrik: 30000, air: 50000 },
 ];
 
 export const MOCK_RIWAYAT = [

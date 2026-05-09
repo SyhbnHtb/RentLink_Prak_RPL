@@ -36,16 +36,6 @@ const MENU_ITEMS = [
     icon: "document",
   },
   {
-    label: "Riwayat Transaksi",
-    path: "/admin/riwayat",
-    icon: "document",
-  },
-  {
-    label: "Verifikasi Pembayaran",
-    path: "/admin/verifikasi",
-    icon: "document",
-  },
-  {
     label: "Laporan Keuangan",
     path: "/admin/laporan",
     icon: "document",
@@ -56,7 +46,7 @@ const MENU_ITEMS = [
  * AdminSidebar
  */
 export default function AdminSidebar({
-  userName = "XianyinksDelEsol User_Email@ddress",
+  userName = "Admin@ddress",
   onLogout,
 }) {
   const location = useLocation();
@@ -72,7 +62,7 @@ export default function AdminSidebar({
 
       {/* ── Profil user ── */}
       <div className="px-6 mb-8">
-        <Link 
+        <Link
           to="/profil"
           className="flex items-center gap-4 pb-6 border-b border-white/20 cursor-pointer hover:bg-white/5 rounded-2xl transition-colors p-2 -ml-2"
         >
@@ -92,16 +82,15 @@ export default function AdminSidebar({
       <nav className="flex-1 px-6 space-y-2 overflow-y-auto">
         {MENU_ITEMS.map((item) => {
           const isActive = location.pathname === item.path;
-          
+
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-colors ${
-                isActive 
-                  ? "bg-white/10 text-secondary" 
-                  : "text-secondary/70 hover:bg-white/5 hover:text-secondary"
-              }`}
+              className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-colors ${isActive
+                ? "bg-white/10 text-secondary"
+                : "text-secondary/70 hover:bg-white/5 hover:text-secondary"
+                }`}
             >
               {item.icon === "dashboard" ? (
                 <DashboardIcon

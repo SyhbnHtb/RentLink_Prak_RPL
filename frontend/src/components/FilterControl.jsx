@@ -41,35 +41,37 @@ export default function FilterControl({
 
   return (
     <div
-      className={`flex py-[22px] px-[25px] flex-col items-start gap-3 rounded-[18.5px] border-[1.54px] border-[rgba(0,0,0,0.07)] bg-[#FFF] w-full ${className}`}
+      className={`bg-surface border border-gray-100 shadow-sm rounded-2xl p-4 flex flex-col gap-2 w-full ${className}`}
     >
       <div className="flex flex-col items-start w-full">
-        <p className="text-[#408A71] font-plusJakartaSans text-[17px] font-medium w-full tracking-[0.04em]">
+        <label className="text-primary font-sans text-sm font-medium uppercase tracking-wide">
           {label}
-        </p>
+        </label>
       </div>
       <div className="flex flex-col items-start w-full relative" ref={dropdownRef}>
         {type === "select" ? (
           <>
             <div 
-              className="flex py-2 px-[19px] items-center gap-[9px] rounded-[30.9px] bg-[rgba(63,63,63,0.10)] w-[309px] cursor-pointer"
+              className="bg-gray-100 rounded-full px-4 py-2 flex items-center justify-between gap-2 cursor-pointer w-full"
               onClick={() => setIsOpen(!isOpen)}
             >
-              {iconSize === "large" ? (
-                <ChevronDownIconLg fill="black" fillOpacity="0.65" />
-              ) : (
-                <ChevronDownIcon fill="black" fillOpacity="0.65" />
-              )}
-              <p className="text-[rgba(0,0,0,0.65)] font-sora text-[19px] font-semibold w-fit">
-                {value && value !== "All" ? value : placeholder}
-              </p>
+              <div className="flex items-center gap-2 overflow-hidden">
+                {iconSize === "large" ? (
+                  <ChevronDownIconLg fill="black" fillOpacity="0.65" className="shrink-0" />
+                ) : (
+                  <ChevronDownIcon fill="black" fillOpacity="0.65" className="shrink-0" />
+                )}
+                <span className="text-gray-600 font-sans font-medium truncate">
+                  {value && value !== "All" ? value : placeholder}
+                </span>
+              </div>
             </div>
             {isOpen && (
-              <div className="absolute top-full mt-2 w-[309px] bg-white rounded-[15px] shadow-lg border border-gray-100 z-50 overflow-hidden max-h-[250px] overflow-y-auto">
+              <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-100 z-50 overflow-hidden max-h-[250px] overflow-y-auto">
                 {options.map((opt) => (
                   <div
                     key={opt}
-                    className="px-[19px] py-3 hover:bg-gray-100 cursor-pointer text-[rgba(0,0,0,0.65)] font-sora text-[16px] font-semibold"
+                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-gray-700 font-sans font-medium"
                     onClick={() => {
                       onChange && onChange(opt);
                       setIsOpen(false);
@@ -82,13 +84,13 @@ export default function FilterControl({
             )}
           </>
         ) : (
-          <div className="flex py-2 px-[19px] items-center gap-[9px] rounded-[30.9px] bg-[rgba(63,63,63,0.10)] w-[309px]">
+          <div className="bg-gray-100 rounded-full px-4 py-2 flex items-center w-full">
             <input 
               type="text"
               placeholder={placeholder}
               value={value || ""}
               onChange={(e) => onChange && onChange(e.target.value)}
-              className="bg-transparent border-none outline-none w-full text-[rgba(0,0,0,0.65)] font-sora text-[19px] font-semibold placeholder:font-sora placeholder:text-[rgba(0,0,0,0.65)]"
+              className="bg-transparent border-none outline-none w-full text-gray-600 font-sans font-medium placeholder:text-gray-400 placeholder:font-sans"
             />
           </div>
         )}
