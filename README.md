@@ -1,29 +1,186 @@
-# RentLink - Apartment Rental & Billing System
+# 🏠 RentLink — Platform Penyewaan Berbasis Web
 
-RentLink adalah sistem manajemen penyewaan unit/apartemen berbasis web yang digunakan untuk mengelola data unit, penyewa, kontrak, meteran, tagihan, pembayaran, riwayat transaksi, dashboard, laporan keuangan, serta profil pengguna.
+![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?style=flat-square&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-v5-000000?style=flat-square&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-v19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v14+-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-v8-646CFF?style=flat-square&logo=vite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
-Project ini dikembangkan untuk kebutuhan Praktikum Rekayasa Perangkat Lunak dengan pembagian role utama:
+Aplikasi platform penyewaan berbasis web yang dibangun dengan arsitektur **REST API** menggunakan Node.js & Express.js sebagai backend dan React.js sebagai frontend.
 
-- Admin
-- Penyewa
+[🚀 Quick Start](#-quick-start) • [🏗️ Arsitektur](#️-arsitektur-sistem) • [📂 Struktur Folder](#-struktur-folder) • [🌐 API](#-konvensi-api) • [🛠️ Troubleshooting](#️-troubleshooting)
 
 ---
 
-## Tech Stack
+## 📋 Table of Contents
+
+- [🤝 Kontributor](#-kontributor)
+- [🌟 Overview](#-overview)
+- [📦 Tech Stack](#-tech-stack)
+- [🏗️ Arsitektur Sistem](#️-arsitektur-sistem)
+- [📂 Struktur Folder](#-struktur-folder)
+- [🚀 Quick Start](#-quick-start)
+- [⚙️ Environment Variables](#️-environment-variables)
+- [▶️ Menjalankan Aplikasi](#️-menjalankan-aplikasi)
+- [🌐 Konvensi API](#-konvensi-api)
+- [🔐 Development Rules](#-development-rules)
+- [🛠️ Troubleshooting](#️-troubleshooting)
+- [🗺️ Future Roadmap](#️-future-roadmap)
+
+---
+
+## 🤝 Kontributor
+
+|            Nama          |        Role        |
+|           ------         |       ------       |
+| Syahbana Hatab           | Project Leader     |
+| Muhamad Reswara Suryawan | Frontend Developer |
+| Josh Peter Sirait        | Backend Developer  |
+| Mikail Hikam Altiyar     | UI/UX Designer     |
+
+---
+
+## 🌟 Overview
+
+**RentLink** adalah platform digital yang menghubungkan penyewa dan pemilik properti/barang dalam satu ekosistem terintegrasi. Dibangun dengan pendekatan **REST API** yang memisahkan backend dan frontend secara penuh (*decoupled architecture*).
+
+### ✨ Key Features
+
+- 🏠 **Manajemen Listing** — Kelola item/properti yang disewakan
+- 🔐 **Autentikasi JWT** — Login & register yang aman
+- 🔎 **Pencarian & Filter** — Temukan sewa yang sesuai kebutuhan
+- 📅 **Manajemen Transaksi** — Proses pemesanan & pembayaran
+- 👤 **Role-Based Access** — Akses berbeda untuk penyewa dan pemilik
+- 📱 **Responsive UI** — Antarmuka yang nyaman di semua perangkat
+
+---
+
+## 📦 Tech Stack
 
 ### Backend
 
-- Node.js
-- Express.js
-- PostgreSQL
-- Supabase
-- JWT Authentication
-- Bcrypt
-- Multer
-- Express Validator
-- CORS
-- Dotenv
-- Nodemon
+| Teknologi | Versi | Keterangan |
+|-----------|-------|------------|
+| [Node.js](https://nodejs.org/) | v18+ | JavaScript runtime |
+| [Express.js](https://expressjs.com/) | v5 | Web framework |
+| [PostgreSQL](https://www.postgresql.org/) | v14+ | Relational database |
+| [pg](https://node-postgres.com/) | v8 | PostgreSQL client |
+| [dotenv](https://github.com/motdotla/dotenv) | v17 | Environment variable loader |
+| [cors](https://github.com/expressjs/cors) | v2 | Cross-Origin Resource Sharing |
+| [nodemon](https://nodemon.io/) | v3 | Auto-reload saat development |
+
+### Frontend
+
+| Teknologi | Versi | Keterangan |
+|-----------|-------|------------|
+| [React.js](https://react.dev/) | v19 | UI library |
+| [Vite](https://vite.dev/) | v8 | Build tool & dev server |
+| [React Router DOM](https://reactrouter.com/) | v7 | Client-side routing |
+| [Axios](https://axios-http.com/) | v1 | HTTP client |
+
+---
+
+## 🏗️ Arsitektur Sistem
+
+```
+┌─────────────────────────────────────────────┐
+│           Browser (Client)                  │
+│         React.js + Vite SPA                 │
+│  ┌──────────────────────────────────────┐   │
+│  │  pages/ │ components/ │ services/   │   │
+│  │  hooks/ │ contexts/   │ utils/      │   │
+│  └──────────────────────────────────────┘   │
+└──────────────────┬──────────────────────────┘
+                   │ HTTP / REST API
+                   │ (Axios → localhost:5000)
+┌──────────────────▼──────────────────────────┐
+│         Express.js Server                   │
+│  ┌──────────────────────────────────────┐   │
+│  │            routes/                   │   │
+│  │     (Definisi endpoint API)          │   │
+│  └──────────────────┬───────────────────┘   │
+│                     │                        │
+│  ┌──────────────────▼───────────────────┐   │
+│  │          middlewares/                 │   │
+│  │  (auth, validasi, error handler)     │   │
+│  └──────────────────┬───────────────────┘   │
+│                     │                        │
+│  ┌──────────────────▼───────────────────┐   │
+│  │          controllers/                 │   │
+│  │       (Handler tiap request)         │   │
+│  └──────────────────┬───────────────────┘   │
+│                     │                        │
+│  ┌──────────────────▼───────────────────┐   │
+│  │    services/ │ models/ │ utils/      │   │
+│  │         (Business logic & query)     │   │
+│  └──────────────────┬───────────────────┘   │
+└──────────────────────┼──────────────────────┘
+                       │
+         ┌─────────────▼─────────────┐
+         │    PostgreSQL Database    │
+         │  (localhost:5432/rentlink) │
+         └───────────────────────────┘
+```
+
+---
+
+## 📂 Struktur Folder
+
+```
+RentLink/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── db.js              # Konfigurasi koneksi PostgreSQL (pg.Pool)
+│   │   ├── controllers/           # Handler request — satu file per resource
+│   │   ├── middlewares/           # Auth JWT, validasi input, error handler
+│   │   ├── models/                # Query SQL per tabel/resource
+│   │   ├── routes/                # Definisi endpoint API (Express Router)
+│   │   ├── services/              # Business logic yang dipanggil controller
+│   │   ├── utils/                 # Helper functions (format, generate, dll)
+│   │   └── server.js              # Entry point — inisialisasi Express & middleware
+│   ├── .env                       # ⚠️ Jangan di-commit ke git
+│   ├── .env.example               # Template environment variable
+│   ├── .gitignore
+│   └── package.json
+│
+├── frontend/
+│   ├── public/                    # Aset statis yang langsung di-serve
+│   ├── src/
+│   │   ├── assets/                # Gambar, font, ikon
+│   │   ├── components/            # Komponen UI yang dapat digunakan ulang
+│   │   ├── contexts/              # React Context API (state global)
+│   │   ├── hooks/                 # Custom React hooks
+│   │   ├── pages/                 # Komponen halaman penuh (1 file = 1 route)
+│   │   ├── services/              # Fungsi pemanggilan API via Axios
+│   │   ├── utils/                 # Helper functions (format tanggal, validasi, dll)
+│   │   ├── App.jsx                # Root component & konfigurasi routing
+│   │   ├── App.css                # Style global
+│   │   ├── index.css              # CSS reset & variabel
+│   │   └── main.jsx               # Entry point — render React ke DOM
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prasyarat
+
+Pastikan sudah menginstal:
+- [Node.js](https://nodejs.org/) **v18** atau lebih baru
+- [PostgreSQL](https://www.postgresql.org/) **v14** atau lebih baru
+- npm **v9** atau lebih baru (sudah termasuk di Node.js)
+
+### 1️⃣ Clone Repository
 
 ### Frontend
 
@@ -58,7 +215,15 @@ RentLink
 └── README.md
 ```
 
----
+### 2️⃣ Setup Database
+
+Buat database PostgreSQL bernama `rentlink`:
+
+```sql
+CREATE DATABASE rentlink;
+```
+
+### 3️⃣ Setup Backend
 
 ## Fitur Backend
 
@@ -86,7 +251,7 @@ POST /api/auth/refresh-token
 POST /api/auth/logout
 ```
 
----
+Salin file environment:
 
 ### Middleware
 
@@ -126,458 +291,31 @@ PUT    /api/unit/:id
 DELETE /api/unit/:id
 ```
 
-Contoh body tambah unit:
+Edit file `.env` dan sesuaikan nilainya (lihat [Environment Variables](#️-environment-variables)).
 
-```json
-{
-  "nama_unit": "Kamar 102",
-  "tipe": "Kamar",
-  "lantai": 1,
-  "harga": 2000000,
-  "status": "tersedia"
-}
+### 4️⃣ Setup Frontend
+
+```bash
+cd ../frontend
+npm install
 ```
 
 ---
 
-### Manajemen Penyewa
-
-Admin dapat mengelola data penyewa.
-
-Fitur:
-
-- Lihat semua penyewa
-- Lihat detail penyewa
-- Tambah penyewa
-- Edit penyewa
-- Hapus penyewa
-- Penyewa dapat melihat unit sendiri
-- Penyewa dapat melihat kontrak sendiri
-
-Endpoint:
-
-```txt
-GET    /api/penyewa
-GET    /api/penyewa/:id
-POST   /api/penyewa
-PUT    /api/penyewa/:id
-DELETE /api/penyewa/:id
-
-GET    /api/penyewa/unit-saya
-GET    /api/penyewa/kontrak-saya
-```
-
-Contoh body tambah penyewa:
-
-```json
-{
-  "name": "Budi Santoso",
-  "email": "budi@rentlink.com",
-  "password": "budi12345",
-  "phone": "081234567891"
-}
-```
-
----
-
-### Manajemen Kontrak
-
-Admin dapat mengelola kontrak antara penyewa dan unit.
-
-Fitur:
-
-- Lihat semua kontrak
-- Lihat detail kontrak
-- Buat kontrak
-- Edit kontrak
-- Hapus kontrak
-- Akhiri kontrak
-- Saat kontrak aktif dibuat, unit dapat berubah menjadi terisi
-- Saat kontrak diakhiri, unit berubah kembali menjadi tersedia
-- Format kode kontrak `C-001`
-
-Endpoint:
-
-```txt
-GET    /api/kontrak
-GET    /api/kontrak/:id
-POST   /api/kontrak
-PUT    /api/kontrak/:id
-DELETE /api/kontrak/:id
-PUT    /api/kontrak/:id/akhiri
-```
-
-Contoh body buat kontrak:
-
-```json
-{
-  "user_id": 2,
-  "unit_id": 1,
-  "tgl_mulai": "2026-05-01",
-  "tgl_akhir": "2027-05-01",
-  "status": "aktif"
-}
-```
-
----
-
-### Manajemen Meteran
-
-Admin dapat menginput dan mengelola data meteran listrik dan air.
-
-Endpoint:
-
-```txt
-GET    /api/meteran
-GET    /api/meteran/:id
-POST   /api/meteran
-PUT    /api/meteran/:id
-DELETE /api/meteran/:id
-```
-
-Contoh body tambah meteran:
-
-```json
-{
-  "unit_id": 1,
-  "bulan": "Mei",
-  "tahun": 2026,
-  "meter_listrik_awal": 100,
-  "meter_listrik_akhir": 150,
-  "meter_air_awal": 20,
-  "meter_air_akhir": 35
-}
-```
-
----
-
-### Tagihan
-
-Admin dapat generate tagihan berdasarkan kontrak aktif dan data meteran.
-
-Fitur:
-
-- Generate tagihan otomatis
-- Lihat semua tagihan
-- Lihat tagihan milik penyewa
-- Lihat detail tagihan
-- Hapus tagihan
-- Filter tagihan berdasarkan status
-- Filter berdasarkan bulan dan tahun
-- Search berdasarkan nama penyewa, email, unit, atau periode
-- Sort berdasarkan terbaru, terlama, total terbesar, dan total terkecil
-- Format kode invoice `INV-001`
-
-Endpoint:
-
-```txt
-POST   /api/tagihan/generate
-GET    /api/tagihan
-GET    /api/tagihan/me
-GET    /api/tagihan/:id
-DELETE /api/tagihan/:id
-```
-
-Query filter:
-
-```txt
-GET /api/tagihan?search=Budi
-GET /api/tagihan?status=belum
-GET /api/tagihan?bulan=Mei&tahun=2026
-GET /api/tagihan?sort=total_terbesar
-```
-
-Contoh body generate tagihan:
-
-```json
-{
-  "kontrak_id": 1,
-  "bulan": "Mei",
-  "tahun": 2026
-}
-```
-
-Status tagihan:
-
-```txt
-belum
-pending
-lunas
-```
-
----
-
-### Pembayaran
-
-Penyewa dapat upload bukti pembayaran. Admin dapat memverifikasi pembayaran.
-
-Endpoint:
-
-```txt
-POST /api/pembayaran/upload
-GET  /api/pembayaran
-GET  /api/pembayaran/:id
-PUT  /api/pembayaran/verifikasi/:id
-```
-
-Contoh upload pembayaran:
-
-```txt
-POST /api/pembayaran/upload
-Body: form-data
-tagihan_id: 1
-bukti: file jpg/png/pdf
-```
-
-Contoh body verifikasi:
-
-```json
-{
-  "status": "lunas"
-}
-```
-
-atau:
-
-```json
-{
-  "status": "ditolak"
-}
-```
-
----
-
-### Riwayat Pembayaran
-
-Admin dapat melihat seluruh riwayat pembayaran. Penyewa hanya dapat melihat riwayat pembayaran miliknya sendiri.
-
-Endpoint:
-
-```txt
-GET /api/pembayaran/riwayat
-GET /api/pembayaran/riwayat/me
-```
-
-Query filter:
-
-```txt
-GET /api/pembayaran/riwayat?search=Budi
-GET /api/pembayaran/riwayat?status=lunas
-GET /api/pembayaran/riwayat?bulan=Mei&tahun=2026
-GET /api/pembayaran/riwayat?sort=terbaru
-```
-
----
-
-### Dashboard Admin
-
-Admin dapat melihat statistik ringkas sistem.
-
-Endpoint:
-
-```txt
-GET /api/dashboard/admin/stats
-```
-
----
-
-### Dashboard Penyewa
-
-Penyewa dapat melihat ringkasan dashboard miliknya.
-
-Endpoint:
-
-```txt
-GET /api/dashboard/penyewa/stats
-```
-
----
-
-### Laporan Keuangan
-
-Admin dapat melihat laporan keuangan dari pembayaran yang sudah lunas.
-
-Endpoint:
-
-```txt
-GET /api/laporan/keuangan
-GET /api/laporan/keuangan?bulan=Mei&tahun=2026
-```
-
----
-
-### Profile / Biodata
-
-Admin dan penyewa dapat melihat serta mengubah data profil masing-masing.
-
-Endpoint:
-
-```txt
-GET /api/profile/me
-PUT /api/profile/me
-PUT /api/profile/change-password
-```
-
-Contoh body update profile:
-
-```json
-{
-  "name": "Budi Santoso",
-  "email": "budi@rentlink.com",
-  "phone": "081234567891",
-  "ktp": "910216769",
-  "asal": "Ngawi"
-}
-```
-
-Contoh body ganti password:
-
-```json
-{
-  "old_password": "budi12345",
-  "new_password": "budi54321",
-  "confirm_password": "budi54321"
-}
-```
-
----
-
-## Database Schema
-
-Database menggunakan PostgreSQL melalui Supabase.
-
-### users
-
-```txt
-id_user
-name
-email
-password
-role
-phone
-ktp
-asal
-```
-
-Role:
-
-```txt
-admin
-penyewa
-```
-
-### unit
-
-```txt
-id_unit
-nama_unit
-tipe
-lantai
-harga
-status
-created_at
-```
-
-Status unit:
-
-```txt
-tersedia
-terisi
-```
-
-### kontrak
-
-```txt
-id_kontrak
-user_id
-unit_id
-tgl_mulai
-tgl_akhir
-status
-```
-
-Status kontrak:
-
-```txt
-aktif
-selesai
-```
-
-### meteran
-
-```txt
-id_meteran
-unit_id
-bulan
-tahun
-meter_listrik_awal
-meter_listrik_akhir
-meter_air_awal
-meter_air_akhir
-```
-
-### tagihan
-
-```txt
-id_tagihan
-kontrak_id
-periode
-biaya_sewa
-biaya_listrik
-biaya_air
-total
-status
-created_at
-```
-
-Status tagihan:
-
-```txt
-belum
-pending
-lunas
-```
-
-### pembayaran
-
-```txt
-id_pembayaran
-tagihan_id
-tanggal
-bukti
-status
-created_at
-```
-
-Status pembayaran:
-
-```txt
-pending
-ditolak
-lunas
-```
-
-### refresh_tokens
-
-```txt
-id_refresh_token
-user_id
-token
-expires_at
-created_at
-```
-
----
-
-## Environment Variables
-
-Buat file `.env` di:
-
-```txt
-backend/backend/.env
-```
-
-Contoh konfigurasi:
+## ⚙️ Environment Variables
+
+### Backend — `backend/.env`
+
+| Variable | Default | Keterangan |
+|----------|---------|------------|
+| `PORT` | `5000` | Port Express server |
+| `DB_HOST` | `localhost` | Host PostgreSQL |
+| `DB_PORT` | `5432` | Port PostgreSQL |
+| `DB_NAME` | `rentlink` | Nama database |
+| `DB_USER` | `postgres` | Username database |
+| `DB_PASSWORD` | *(wajib diisi)* | Password database |
+
+Contoh isi file `.env`:
 
 ```env
 PORT=5000
@@ -596,192 +334,248 @@ TARIF_LISTRIK_PER_KWH=1500
 TARIF_AIR_PER_M3=5000
 ```
 
-Catatan:
+### Frontend — `frontend/.env.local` *(opsional)*
 
-```txt
-Jangan push file .env ke GitHub.
-Pastikan .env masuk ke .gitignore.
+| Variable | Default | Keterangan |
+|----------|---------|------------|
+| `VITE_API_URL` | `http://localhost:5000/api` | Base URL backend API |
+
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ---
 
-## Instalasi Backend
+## ▶️ Menjalankan Aplikasi
 
-Masuk ke folder backend:
+Jalankan backend dan frontend di **dua terminal terpisah**.
+
+### Terminal 1 — Backend
 
 ```bash
 cd backend/backend
 ```
 
-Install dependencies:
+# Mode development (auto-reload dengan nodemon)
+npm run dev
 
 ```bash
 npm install
 ```
 
-Jalankan server development:
+Backend berjalan di: **`http://localhost:5000`**
+
+### Terminal 2 — Frontend
 
 ```bash
 npm run dev
 ```
 
-Server berjalan di:
+Frontend berjalan di: **`http://localhost:5173`**
 
-```txt
-http://localhost:5000
-```
+### Semua Scripts
+
+| Direktori | Script | Keterangan |
+|-----------|--------|------------|
+| `backend` | `npm run dev` | Jalankan server dengan nodemon (auto-reload) |
+| `backend` | `npm start` | Jalankan server tanpa auto-reload |
+| `frontend` | `npm run dev` | Jalankan Vite dev server |
+| `frontend` | `npm run build` | Build untuk production |
+| `frontend` | `npm run preview` | Preview hasil build |
+| `frontend` | `npm run lint` | Jalankan ESLint |
 
 ---
 
-## Endpoint Testing Dasar
+## 🌐 Konvensi API
 
-Test server:
+### Base URL
 
-```txt
-GET http://localhost:5000/
+```
+http://localhost:5000/api
 ```
 
-Expected response:
+### Penamaan Endpoint
+
+Gunakan **kebab-case** dan **noun** (bukan verb) untuk nama resource:
+
+```
+GET    /api/items            → ambil semua item
+GET    /api/items/:id        → ambil satu item
+POST   /api/items            → buat item baru
+PUT    /api/items/:id        → update item
+DELETE /api/items/:id        → hapus item
+```
+
+### Format Response
+
+Semua response menggunakan format JSON yang konsisten:
 
 ```json
+// ✅ Sukses
 {
   "success": true,
-  "message": "API RentLink berjalan!"
+  "message": "Data berhasil diambil",
+  "data": { }
+}
+
+// ❌ Error
+{
+  "success": false,
+  "message": "Item tidak ditemukan",
+  "error": "NOT_FOUND"
 }
 ```
 
-Test health check:
+### HTTP Status Code
 
-```txt
-GET http://localhost:5000/api/health
+| Status | Keterangan |
+|--------|------------|
+| `200` | OK — request berhasil |
+| `201` | Created — resource berhasil dibuat |
+| `400` | Bad Request — input tidak valid |
+| `401` | Unauthorized — belum login / token tidak valid |
+| `403` | Forbidden — tidak punya izin |
+| `404` | Not Found — resource tidak ditemukan |
+| `500` | Internal Server Error — kesalahan di server |
+
+---
+
+## 🔐 Development Rules
+
+> ⚠️ **WAJIB DIBACA** oleh semua anggota tim sebelum mulai coding.
+
+| Rule | Keterangan |
+|------|------------|
+| 🚫 **Jangan commit `.env`** | File `.env` berisi kredensial — selalu ada di `.gitignore` |
+| 📛 **Gunakan konvensi penamaan** | camelCase untuk JS, kebab-case untuk URL, snake_case untuk kolom DB |
+| 🌿 **Branch per fitur** | Jangan langsung push ke `main` — buat branch dulu |
+| 🔄 **Pull sebelum push** | Selalu `git pull` sebelum mulai kerja untuk menghindari konflik |
+| ✅ **Test sebelum commit** | Pastikan tidak ada error sebelum commit |
+| 📝 **Pesan commit yang jelas** | Ikuti konvensi commit message di bawah |
+
+### Git Workflow
+
+```bash
+# Buat branch baru untuk setiap fitur
+git checkout -b feature/nama-fitur
+
+# Setelah selesai, commit dengan pesan yang jelas
+git add .
+git commit -m "feat(auth): tambah endpoint login"
+
+# Push dan buat Pull Request ke main
+git push origin feature/nama-fitur
 ```
 
-Expected response:
+### Konvensi Commit Message
 
-```json
-{
-  "success": true,
-  "message": "Server RentLink aktif"
-}
+```
+feat(scope): deskripsi singkat fitur baru
+fix(scope): deskripsi singkat bug yang diperbaiki
+docs(readme): update panduan instalasi
+refactor(auth): sederhanakan middleware validasi
+style(frontend): rapikan komponen Card
 ```
 
 ---
 
-## Alur Testing Utama
+## 🛠️ Troubleshooting
 
-Urutan testing backend RentLink:
+<details>
+<summary><strong>❌ Error: Cannot connect to database</strong></summary>
 
-```txt
-1. Register admin
-2. Update role admin di database
-3. Login admin
-4. Tambah unit
-5. Tambah penyewa
-6. Buat kontrak aktif
-7. Input meteran
-8. Generate tagihan
-9. Login penyewa
-10. Penyewa melihat tagihan
-11. Penyewa upload bukti pembayaran
-12. Admin melihat pembayaran
-13. Admin verifikasi pembayaran
-14. Admin melihat dashboard
-15. Admin melihat laporan keuangan
-16. Penyewa melihat dashboard penyewa
-17. User melihat dan edit profile
-18. User mengganti password
+Pastikan PostgreSQL sudah berjalan dan nilai di `.env` sudah benar:
+
+```bash
+# Cek apakah PostgreSQL aktif
+pg_isready -h localhost -p 5432
+
+# Test koneksi manual
+psql -U postgres -d rentlink
 ```
+
+Cek juga apakah database `rentlink` sudah dibuat dengan `CREATE DATABASE rentlink;`.
+
+</details>
+
+<details>
+<summary><strong>❌ Error: Port 5000 already in use</strong></summary>
+
+Ganti port di file `.env`:
+
+```env
+PORT=5001
+```
+
+Atau matikan proses yang menggunakan port 5000:
+
+```bash
+# Windows
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+
+# Linux/Mac
+lsof -ti:5000 | xargs kill
+```
+
+</details>
+
+<details>
+<summary><strong>❌ CORS error di browser</strong></summary>
+
+Pastikan di `backend/src/server.js` CORS sudah dikonfigurasi dengan origin frontend:
+
+```js
+app.use(cors({
+  origin: 'http://localhost:5173',
+}));
+```
+
+</details>
+
+<details>
+<summary><strong>❌ Module not found setelah clone</strong></summary>
+
+Jalankan `npm install` di **kedua** direktori:
+
+```bash
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+</details>
+
+<details>
+<summary><strong>❌ Frontend tidak bisa fetch ke backend</strong></summary>
+
+Pastikan:
+1. Backend sudah berjalan di `http://localhost:5000`
+2. `VITE_API_URL` di `frontend/.env.local` sudah benar
+3. Tidak ada typo di URL endpoint
+
+</details>
 
 ---
 
-## Keamanan
+## 🗺️ Future Roadmap
 
-Backend RentLink sudah menerapkan:
-
-- Password hashing menggunakan bcrypt
-- JWT authentication
-- Refresh token
-- Role-based access control
-- Validasi request payload
-- File upload validation
-- Error handling terpusat
-- Proteksi endpoint admin
-- Proteksi endpoint penyewa
+- [ ] 🔐 Autentikasi JWT — login, register, refresh token
+- [ ] 📸 Upload foto item — integrasi cloud storage
+- [ ] 💬 Sistem review & rating
+- [ ] 📅 Kalender ketersediaan item
+- [ ] 💳 Integrasi payment gateway
+- [ ] 🔔 Notifikasi real-time
+- [ ] 📊 Dashboard analitik untuk pemilik
+- [ ] 📱 Progressive Web App (PWA)
 
 ---
 
-## Catatan GitHub
+## 📚 Referensi
 
-File/folder yang tidak boleh dipush:
-
-```txt
-.env
-node_modules/
-uploads/
-```
-
-Contoh `.gitignore`:
-
-```gitignore
-node_modules/
-backend/backend/node_modules/
-
-.env
-.env.local
-backend/backend/.env
-backend/backend/.env.local
-
-uploads/
-backend/backend/uploads/
-
-dist/
-build/
-
-*.log
-npm-debug.log*
-```
-
----
-
-## Status Pengembangan Backend
-
-Backend RentLink saat ini sudah mendukung modul:
-
-```txt
-KAN-39  Pengembangan sistem role
-KAN-40  Sistem authentication
-KAN-43  Database riwayat
-KAN-52  Inisialisasi backend
-KAN-53  Endpoint register
-KAN-54  Endpoint login
-KAN-55  JWT verification & RBAC
-KAN-56  Logout & refresh token
-KAN-57  Manajemen Unit CRUD
-KAN-58  Manajemen Penyewa CRUD
-KAN-59  Manajemen Kontrak CRUD
-KAN-60  Manajemen Meteran CRUD
-KAN-61  Generate Tagihan Otomatis
-KAN-62  Lihat Tagihan
-KAN-63  Upload Bukti Pembayaran
-KAN-64  Verifikasi Pembayaran
-KAN-65  Riwayat Pembayaran
-KAN-66  Statistik Dashboard Admin
-KAN-67  Laporan Keuangan
-KAN-68  Error Handling Middleware Terpusat
-KAN-69  Validasi Request Payload
-KAN-70  Update Schema Tambahan UI
-KAN-71  Profile/Biodata & Ganti Password
-KAN-72  Dashboard Penyewa
-KAN-73  Unit Saya & Kontrak Saya
-KAN-74  Filter Search Sort Tagihan dan Riwayat
-KAN-75  Akhiri Kontrak & Hapus Tagihan
-KAN-76  Format Kode Invoice dan Kode Kontrak
-```
-
----
-
-## Developer
-
-Project: RentLink  
-Role: Backend Developer  
-Repository: RentLink_Prak_RPL
+- [Node.js Documentation](https://nodejs.org/docs/)
+- [Express.js Documentation](https://expressjs.com/)
+- [React Documentation](https://react.dev/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Vite Documentation](https://vite.dev/)
+- [React Router Documentation](https://reactrouter.com/)
+- [Axios Documentation](https://axios-http.com/docs/intro)
