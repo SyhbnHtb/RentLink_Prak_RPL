@@ -1,38 +1,93 @@
+// backend\backend\src\controllers\authController.js
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken'); // Tambahkan library JWT
-const userModel = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 
-// --- FUNGSI REGISTER (Sudah kita buat sebelumnya) ---
+const userModel = require('../models/userModel');
+const refreshTokenModel = require('../models/refreshTokenModel');
+
+// Generate access token
+const generateAccessToken = (user) => {
+    return jwt.sign(
+        {
+            id_user: user.id_user,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m'
+        }
+    );
+};
+
+// Generate refresh token
+const generateRefreshToken = (user) => {
+    return jwt.sign(
+        {
+            id_user: user.id_user,
+            role: user.role,
+            type: 'refresh'
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
+        }
+    );
+};
+
+// Hitung tanggal expired refresh token
+const getRefreshTokenExpiresAt = () => {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    return expiresAt;
+};
+
+// POST /api/auth/register
 const register = async (req, res) => {
     try {
         const { name, email, password } = req.body || {};
 
         if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: 'Data tidak lengkap!' });
+            return res.status(400).json({
+                success: false,
+                message: 'Data tidak lengkap!'
+            });
         }
 
         const existingUser = await userModel.getUserByEmail(email);
+
         if (existingUser) {
-            return res.status(400).json({ success: false, message: 'Email sudah terdaftar.' });
+            return res.status(400).json({
+                success: false,
+                message: 'Email sudah terdaftar.'
+            });
         }
 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const newUser = await userModel.createUser(name, email, hashedPassword);
 
-        res.status(201).json({ success: true, message: 'Registrasi berhasil!', data: newUser });
+        res.status(201).json({
+            success: true,
+            message: 'Registrasi berhasil!',
+            data: newUser
+        });
     } catch (error) {
         console.error('Error saat register:', error.message);
-        res.status(500).json({ success: false, message: 'Terjadi kesalahan internal', error: error.message });
+
+        res.status(500).json({
+            success: false,
+            message: 'Terjadi kesalahan internal',
+            error: error.message
+        });
     }
 };
 
-// --- FUNGSI LOGIN (BARU) ---
+// POST /api/auth/login
 const login = async (req, res) => {
     try {
         const { email, password } = req.body || {};
 
-        // 1. Validasi Input
         if (!email || !password) {
             return res.status(400).json({
                 success: false,
@@ -40,8 +95,8 @@ const login = async (req, res) => {
             });
         }
 
-        // 2. Cari User berdasarkan email
         const user = await userModel.getUserByEmail(email);
+
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -49,8 +104,8 @@ const login = async (req, res) => {
             });
         }
 
-        // 3. Verifikasi Password menggunakan bcrypt
         const isPasswordMatch = await bcrypt.compare(password, user.password);
+
         if (!isPasswordMatch) {
             return res.status(401).json({
                 success: false,
@@ -58,15 +113,18 @@ const login = async (req, res) => {
             });
         }
 
-        // 4. Buat Token JWT (Kartu Akses)
-        // Kita menitipkan id_user dan role ke dalam token ini
-        const token = jwt.sign(
-            { id_user: user.id_user, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1d' } // Token berlaku selama 1 hari
+        // Bersihkan refresh token expired
+        await refreshTokenModel.deleteExpiredRefreshTokens();
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        await refreshTokenModel.createRefreshToken(
+            user.id_user,
+            refreshToken,
+            getRefreshTokenExpiresAt()
         );
 
-        // 5. Berikan Response Sukses beserta Token
         res.status(200).json({
             success: true,
             message: 'Login berhasil!',
@@ -75,12 +133,18 @@ const login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token: token
+
+                // Tetap kirim token agar kompatibel dengan kode lama Anda
+                token: accessToken,
+
+                // Nama yang lebih jelas untuk alur baru
+                accessToken,
+                refreshToken
             }
         });
-
     } catch (error) {
         console.error('Error saat login:', error.message);
+
         res.status(500).json({
             success: false,
             message: 'Terjadi kesalahan internal pada server',
@@ -89,8 +153,121 @@ const login = async (req, res) => {
     }
 };
 
-// Jangan lupa export fungsi login-nya
+// POST /api/auth/refresh-token
+const refreshToken = async (req, res) => {
+    try {
+        const { refreshToken } = req.body || {};
+
+        if (!refreshToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Refresh token wajib diisi'
+            });
+        }
+
+        const savedToken = await refreshTokenModel.getRefreshTokenWithUser(refreshToken);
+
+        if (!savedToken) {
+            return res.status(403).json({
+                success: false,
+                message: 'Refresh token tidak valid atau sudah logout'
+            });
+        }
+
+        if (new Date(savedToken.expires_at) < new Date()) {
+            await refreshTokenModel.deleteRefreshToken(refreshToken);
+
+            return res.status(403).json({
+                success: false,
+                message: 'Refresh token sudah kedaluwarsa, silakan login ulang'
+            });
+        }
+
+        let decoded;
+
+        try {
+            decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+        } catch (error) {
+            await refreshTokenModel.deleteRefreshToken(refreshToken);
+
+            return res.status(403).json({
+                success: false,
+                message: 'Refresh token tidak valid'
+            });
+        }
+
+        if (decoded.type !== 'refresh') {
+            return res.status(403).json({
+                success: false,
+                message: 'Token yang dikirim bukan refresh token'
+            });
+        }
+
+        const user = {
+            id_user: savedToken.id_user,
+            role: savedToken.role
+        };
+
+        const newAccessToken = generateAccessToken(user);
+
+        res.status(200).json({
+            success: true,
+            message: 'Access token berhasil diperbarui',
+            data: {
+                token: newAccessToken,
+                accessToken: newAccessToken
+            }
+        });
+    } catch (error) {
+        console.error('Error refreshToken:', error.message);
+
+        res.status(500).json({
+            success: false,
+            message: 'Gagal memperbarui access token',
+            error: error.message
+        });
+    }
+};
+
+// POST /api/auth/logout
+const logout = async (req, res) => {
+    try {
+        const { refreshToken } = req.body || {};
+
+        if (!refreshToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'Refresh token wajib diisi untuk logout'
+            });
+        }
+
+        const deletedToken = await refreshTokenModel.deleteRefreshToken(refreshToken);
+
+        if (!deletedToken) {
+            return res.status(404).json({
+                success: false,
+                message: 'Refresh token tidak ditemukan atau user sudah logout'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Logout berhasil'
+        });
+    } catch (error) {
+        console.error('Error logout:', error.message);
+
+        res.status(500).json({
+            success: false,
+            message: 'Gagal logout',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     register,
-    login
+    login,
+    refreshToken,
+    logout
 };
