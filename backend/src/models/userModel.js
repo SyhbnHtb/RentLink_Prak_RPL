@@ -1,3 +1,4 @@
+//backend\backend\src\models\userModel.js
 const pool = require('../config/db');
 
 // Fungsi untuk mencari user berdasarkan email (mencegah duplikat)

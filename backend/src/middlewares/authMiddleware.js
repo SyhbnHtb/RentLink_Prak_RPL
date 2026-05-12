@@ -1,3 +1,4 @@
+// backend\backend\src\middlewares\authMiddleware.js
 const jwt = require('jsonwebtoken');
 
 // 1. Satpam Pengecek Tiket (Apakah user sudah login?)

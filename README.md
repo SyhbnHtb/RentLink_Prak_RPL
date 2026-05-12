@@ -182,9 +182,37 @@ Pastikan sudah menginstal:
 
 ### 1️⃣ Clone Repository
 
-```bash
-git clone https://github.com/SyhbnHtb/RentLink_Prak_RPL.git
-cd RentLink
+### Frontend
+
+- Disesuaikan dengan desain UI/UX RentLink
+- Integrasi API backend menggunakan endpoint yang tersedia
+
+---
+
+## Struktur Project
+
+```txt
+RentLink
+├── backend
+│   └── backend
+│       ├── src
+│       │   ├── config
+│       │   │   └── db.js
+│       │   ├── controllers
+│       │   ├── middlewares
+│       │   ├── models
+│       │   ├── routes
+│       │   ├── services
+│       │   ├── utils
+│       │   ├── validators
+│       │   └── server.js
+│       ├── uploads
+│       ├── .env
+│       ├── package-lock.json
+│       └── package.json
+├── frontend
+├── .gitignore
+└── README.md
 ```
 
 ### 2️⃣ Setup Database
@@ -197,15 +225,70 @@ CREATE DATABASE rentlink;
 
 ### 3️⃣ Setup Backend
 
-```bash
-cd backend
-npm install
+## Fitur Backend
+
+### Authentication & Authorization
+
+Backend mendukung autentikasi dan otorisasi berbasis JWT.
+
+Fitur:
+
+- Register user
+- Login user
+- JWT access token
+- Refresh token
+- Logout
+- Role-based access control
+- Role admin
+- Role penyewa
+
+Endpoint:
+
+```txt
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh-token
+POST /api/auth/logout
 ```
 
 Salin file environment:
 
-```bash
-cp .env.example .env
+### Middleware
+
+Backend menggunakan middleware berikut:
+
+- `verifyToken` untuk autentikasi JWT
+- `isAdmin` untuk membatasi akses khusus admin
+- `errorHandler` untuk error handling terpusat
+- `notFound` untuk route yang tidak ditemukan
+- `uploadMiddleware` untuk upload bukti pembayaran
+- `validationMiddleware` untuk validasi request payload
+
+---
+
+### Manajemen Unit
+
+Admin dapat mengelola data unit.
+
+Fitur:
+
+- Lihat semua unit
+- Lihat detail unit
+- Tambah unit
+- Edit unit
+- Hapus unit
+- Status unit tersedia/terisi
+- Data lantai unit
+- Tanggal dibuat unit
+
+Endpoint:
+
+```txt
+GET    /api/unit
+GET    /api/unit/:id
+POST   /api/unit
+PUT    /api/unit/:id
+DELETE /api/unit/:id
 ```
 
 Edit file `.env` dan sesuaikan nilainya (lihat [Environment Variables](#️-environment-variables)).
@@ -237,11 +320,18 @@ Contoh isi file `.env`:
 ```env
 PORT=5000
 
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=rentlink
-DB_USER=postgres
-DB_PASSWORD=yourpassword
+DB_HOST=your_database_host
+DB_PORT=6543
+DB_NAME=postgres
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+
+JWT_SECRET=your_jwt_secret
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+TARIF_LISTRIK_PER_KWH=1500
+TARIF_AIR_PER_M3=5000
 ```
 
 ### Frontend — `frontend/.env.local` *(opsional)*
@@ -263,13 +353,14 @@ Jalankan backend dan frontend di **dua terminal terpisah**.
 ### Terminal 1 — Backend
 
 ```bash
-cd backend
+cd backend/backend
+```
 
 # Mode development (auto-reload dengan nodemon)
 npm run dev
 
-# Mode production
-npm start
+```bash
+npm install
 ```
 
 Backend berjalan di: **`http://localhost:5000`**
@@ -277,7 +368,6 @@ Backend berjalan di: **`http://localhost:5000`**
 ### Terminal 2 — Frontend
 
 ```bash
-cd frontend
 npm run dev
 ```
 
