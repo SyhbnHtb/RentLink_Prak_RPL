@@ -157,6 +157,31 @@ const deleteMeteran = async (id_meteran) => {
     return result.rows[0];
 };
 
+// Ambil data meteran berdasarkan user (penyewa)
+const getMeteranByUserId = async (user_id) => {
+    const result = await pool.query(
+        `SELECT 
+            m.id_meteran,
+            m.unit_id,
+            u.nama_unit,
+            u.tipe,
+            m.bulan,
+            m.tahun,
+            m.meter_listrik_awal,
+            m.meter_listrik_akhir,
+            m.meter_air_awal,
+            m.meter_air_akhir
+         FROM meteran m
+         JOIN unit u ON m.unit_id = u.id_unit
+         JOIN kontrak k ON m.unit_id = k.unit_id
+         WHERE k.user_id = $1 AND k.status = 'aktif'
+         ORDER BY m.tahun DESC, m.id_meteran DESC`,
+        [user_id]
+    );
+
+    return result.rows;
+};
+
 module.exports = {
     getAllMeteran,
     getMeteranById,
@@ -164,5 +189,6 @@ module.exports = {
     getMeteranByUnitPeriode,
     createMeteran,
     updateMeteran,
-    deleteMeteran
+    deleteMeteran,
+    getMeteranByUserId
 };

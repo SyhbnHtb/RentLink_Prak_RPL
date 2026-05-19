@@ -2,19 +2,36 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_UNITS } from "../utils/mockData";
+import * as unitService from "../services/unitService";
 
 export default function ManagementUnit() {
-  const { data, filters, handleFilterChange, setData } = useTableFilter(MOCK_UNITS);
+  const { data, filters, handleFilterChange, setData } = useTableFilter([]);
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [actionType, setActionType] = useState(null); // 'create', 'edit', 'delete'
+  const [isLoading, setIsLoading] = useState(false);
   
   // Form state
   const [formNama, setFormNama] = useState("");
   const [formLantai, setFormLantai] = useState("");
   const [isLantaiDropdownOpen, setIsLantaiDropdownOpen] = useState(false);
+
+  const fetchUnits = async () => {
+    setIsLoading(true);
+    try {
+      const units = await unitService.getUnits();
+      setData(units || []);
+    } catch (e) {
+      console.error("Gagal mengambil data unit:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnits();
+  }, []);
 
   const formatRupiah = (number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -43,35 +60,50 @@ export default function ManagementUnit() {
     setFormLantai("");
   };
 
-  const handleSaveForm = () => {
+  const handleSaveForm = async () => {
     if (!formNama || !formLantai) return;
     
-    if (actionType === "create") {
-      const newUnit = {
-        id: `U-00${data.length + 5}`, // Mock ID
-        nama: formNama,
-        lantai: formLantai,
-        harga: 200000, // Default mock price
-        status: "Tersedia",
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      setData([...data, newUnit]);
-    } else if (actionType === "edit") {
-      const updatedData = data.map(item => 
-        item.id === selectedUnit.id ? { ...item, nama: formNama, lantai: formLantai } : item
-      );
-      setData(updatedData);
+    setIsLoading(true);
+    try {
+      if (actionType === "create") {
+        await unitService.createUnit({
+          nama: formNama,
+          lantai: formLantai,
+          harga: 200000,
+          status: "Tersedia"
+        });
+      } else if (actionType === "edit") {
+        await unitService.updateUnit(selectedUnit.id, {
+          nama: formNama,
+          lantai: formLantai,
+          harga: selectedUnit.harga,
+          status: selectedUnit.status
+        });
+      }
+      await fetchUnits();
+      
+      setActionType(null);
+      setFormNama("");
+      setFormLantai("");
+    } catch (e) {
+      console.error("Gagal menyimpan unit:", e);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setActionType(null);
-    setFormNama("");
-    setFormLantai("");
   };
 
-  const confirmDelete = () => {
-    setData(data.filter(item => item.id !== selectedUnit.id));
-    setActionType(null);
-    setSelectedUnit(null);
+  const confirmDelete = async () => {
+    setIsLoading(true);
+    try {
+      await unitService.deleteUnit(selectedUnit.id);
+      await fetchUnits();
+      setActionType(null);
+      setSelectedUnit(null);
+    } catch (e) {
+      console.error("Gagal menghapus unit:", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -113,7 +145,8 @@ export default function ManagementUnit() {
             {/* Tambah Unit Button */}
             <button 
               onClick={handleCreateClick}
-              className="w-full md:w-auto h-full py-4 px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group"
+              disabled={isLoading}
+              className="w-full md:w-auto h-full py-4 px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group disabled:opacity-50"
             >
               <span className="text-primary font-sans text-xl font-bold group-hover:scale-105 transition-transform">+ Tambah Unit</span>
             </button>
@@ -121,7 +154,12 @@ export default function ManagementUnit() {
           </div>
 
           {/* Table */}
-          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
@@ -209,9 +247,10 @@ export default function ManagementUnit() {
 
                 <button 
                   onClick={handleSaveForm}
-                  className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-full transition-colors mt-4 cursor-pointer"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-full transition-colors mt-4 cursor-pointer disabled:opacity-50"
                 >
-                  {actionType === "create" ? "Buat Unit" : "Simpan Perubahan"}
+                  {isLoading ? "Menyimpan..." : (actionType === "create" ? "Buat Unit" : "Simpan Perubahan")}
                 </button>
               </div>
             )}

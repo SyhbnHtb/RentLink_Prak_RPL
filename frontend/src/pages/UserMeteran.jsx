@@ -1,14 +1,33 @@
 import UserLayout from "../components/UserLayout";
-import { useAuth } from "../contexts/AuthContext";
-import { MOCK_METERAN } from "../utils/mockData";
+import { useState, useEffect } from "react";
+import * as userService from "../services/userService";
+import * as tagService from "../services/tagService";
 
 export default function UserMeteran() {
-  const { user } = useAuth();
-  const userName = user?.name || "Nasir";
+  const [unit, setUnit] = useState(null);
+  const [tagihan, setTagihan] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Filter data meteran milik user yang login
-  const userMeteran = MOCK_METERAN.filter((m) => m.penyewa === userName);
-  const meteran = userMeteran[0] || null;
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const unitData = await userService.getUnitSaya();
+        setUnit(unitData);
+
+        const tagihanData = await tagService.getTagihanSaya();
+        // Cari tagihan paling terbaru
+        if (tagihanData && tagihanData.length > 0) {
+          setTagihan(tagihanData[0]);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data meteran saya", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -20,9 +39,16 @@ export default function UserMeteran() {
   };
 
   return (
-    <UserLayout title="Data Meteran">
-      <div className="flex flex-col gap-8 w-full max-w-4xl">
-        {meteran ? (
+    <UserLayout title="Data Meteran & Utilitas">
+      <div className="flex flex-col gap-8 w-full max-w-4xl relative">
+        
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        {unit ? (
           <>
             {/* Unit Info */}
             <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-8 flex flex-col gap-6">
@@ -44,10 +70,10 @@ export default function UserMeteran() {
                 </div>
                 <div>
                   <h2 className="text-gray-900 font-bold text-2xl">
-                    {meteran.namaUnit}
+                    {unit.nama_unit}
                   </h2>
                   <p className="text-gray-500 text-sm">
-                    Lantai {meteran.lantai} · ID: {meteran.id}
+                    Lantai {unit.lantai} · ID: {unit.id_unit}
                   </p>
                 </div>
               </div>
@@ -73,16 +99,13 @@ export default function UserMeteran() {
                       </svg>
                     </div>
                     <span className="text-yellow-700 font-semibold text-sm uppercase tracking-wider">
-                      Listrik
+                      Biaya Listrik
                     </span>
                   </div>
-                  <p className="text-gray-900 font-bold text-3xl">
-                    {meteran.listrik !== null ? `${meteran.listrik}` : "-"}
-                    <span className="text-gray-500 font-medium text-base ml-1">
-                      kWh
-                    </span>
+                  <p className="text-gray-900 font-bold text-2xl">
+                    {tagihan ? formatRupiah(tagihan.biaya_listrik) : "Rp -"}
                   </p>
-                  <p className="text-gray-500 text-xs">Pemakaian bulan ini</p>
+                  <p className="text-gray-500 text-xs">Biaya bulan ini</p>
                 </div>
 
                 {/* Air */}
@@ -104,16 +127,13 @@ export default function UserMeteran() {
                       </svg>
                     </div>
                     <span className="text-blue-700 font-semibold text-sm uppercase tracking-wider">
-                      Air
+                      Biaya Air
                     </span>
                   </div>
-                  <p className="text-gray-900 font-bold text-3xl">
-                    {meteran.air !== null ? `${meteran.air}` : "-"}
-                    <span className="text-gray-500 font-medium text-base ml-1">
-                      m³
-                    </span>
+                  <p className="text-gray-900 font-bold text-2xl">
+                    {tagihan ? formatRupiah(tagihan.biaya_air) : "Rp -"}
                   </p>
-                  <p className="text-gray-500 text-xs">Pemakaian bulan ini</p>
+                  <p className="text-gray-500 text-xs">Biaya bulan ini</p>
                 </div>
 
                 {/* Total Biaya */}
@@ -135,11 +155,11 @@ export default function UserMeteran() {
                       </svg>
                     </div>
                     <span className="text-green-700 font-semibold text-sm uppercase tracking-wider">
-                      Estimasi Biaya
+                      Estimasi Total Utilitas
                     </span>
                   </div>
                   <p className="text-gray-900 font-bold text-2xl">
-                    {formatRupiah(meteran.total)}
+                    {tagihan ? formatRupiah(Number(tagihan.biaya_listrik || 0) + Number(tagihan.biaya_air || 0)) : "Rp -"}
                   </p>
                   <p className="text-gray-500 text-xs">
                     Listrik + Air bulan ini
@@ -167,17 +187,17 @@ export default function UserMeteran() {
               </div>
               <div>
                 <p className="text-blue-800 font-semibold text-sm">
-                  Informasi Meteran
+                  Informasi Meteran & Utilitas
                 </p>
                 <p className="text-blue-600 text-sm mt-1">
                   Data pemakaian diperbarui setiap awal bulan oleh admin.
-                  Biaya meteran akan ditagihkan bersama dengan tagihan sewa
+                  Biaya listrik dan air ini akan ditagihkan bersama dengan tagihan sewa
                   bulanan Anda.
                 </p>
               </div>
             </div>
           </>
-        ) : (
+        ) : !isLoading && (
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-12 flex flex-col items-center gap-4 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
               <svg
@@ -195,7 +215,7 @@ export default function UserMeteran() {
               </svg>
             </div>
             <p className="text-gray-500 font-medium">
-              Tidak ada data meteran ditemukan.
+              Kamu belum menyewa unit atau data tidak ditemukan.
             </p>
             <p className="text-gray-400 text-sm">
               Hubungi admin jika kamu merasa ada masalah.

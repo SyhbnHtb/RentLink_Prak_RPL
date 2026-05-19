@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -13,9 +13,9 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    const result = await login(username, password);
+    const result = await login(email, password);
     if (result && !result.success) {
-      setError(result.message);
+      setError(result.message || "Gagal login.");
     }
   };
 
@@ -38,16 +38,17 @@ export default function LoginPage() {
           
           <form className="w-full max-w-[480px] flex flex-col gap-6" onSubmit={handleLogin}>
             
-            {/* Username */}
+            {/* Email */}
             <div className="flex flex-col gap-2">
               <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
-                Username
+                Email
               </label>
               <input 
-                type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
+                required
               />
             </div>
             
@@ -62,6 +63,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 pr-14 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
+                  required
                 />
                 <button 
                   type="button" 

@@ -2,15 +2,33 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import * as tagService from "../services/tagService";
 
 export default function LaporanKeuangan() {
-  const { data, filters, handleFilterChange, sortConfig, handleSort } =
-    useTableFilter(MOCK_TAGIHAN);
+  const { data, filters, handleFilterChange, sortConfig, handleSort, setData } =
+    useTableFilter([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tagihanList, setTagihanList] = useState([]);
+
+  useEffect(() => {
+    const fetchTagihan = async () => {
+      setIsLoading(true);
+      try {
+        const tagihanData = await tagService.getTagihan();
+        setTagihanList(tagihanData || []);
+        setData(tagihanData || []);
+      } catch (error) {
+        console.error("Gagal mengambil tagihan", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTagihan();
+  }, [setData]);
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -30,32 +48,38 @@ export default function LaporanKeuangan() {
     });
   };
 
-  // Hitung summary dari MOCK_TAGIHAN
-  const totalPemasukan = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai"
+  // Hitung summary dari tagihanList
+  const totalPemasukan = tagihanList.filter(
+    (t) => t.status === "Approved" || t.status === "Selesai" || t.status === "lunas"
   ).reduce((sum, t) => sum + (t.total || 0), 0);
 
-  const totalBelumLunas = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Belum Bayar"
+  const totalBelumLunas = tagihanList.filter(
+    (t) => t.status === "Belum Bayar" || t.status === "belum" || t.status === "Menunggu Konfirmasi"
   ).reduce((sum, t) => sum + (t.total || 0), 0);
 
   const totalUnitAktif = new Set(
-    MOCK_TAGIHAN.map((t) => t.namaUnit)
+    tagihanList.map((t) => t.namaUnit)
   ).size;
 
-  const totalSelesai = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai"
+  const totalSelesai = tagihanList.filter(
+    (t) => t.status === "Approved" || t.status === "Selesai" || t.status === "lunas"
   ).length;
 
   return (
     <AdminLayout title="Laporan Keuangan">
-      <div className="flex flex-col gap-10 w-full max-w-7xl">
+      <div className="flex flex-col gap-10 w-full max-w-7xl relative">
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
             <p className="text-gray-500 font-sans text-sm font-medium uppercase tracking-wider">
-              Total Pemasukan Bulan Ini
+              Total Pemasukan
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
               {formatRupiah(totalPemasukan)}
@@ -71,7 +95,7 @@ export default function LaporanKeuangan() {
           </div>
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
             <p className="text-gray-500 font-sans text-sm font-medium uppercase tracking-wider">
-              Total Unit Aktif
+              Total Unit Tertagih
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
               {totalUnitAktif}
@@ -200,7 +224,7 @@ export default function LaporanKeuangan() {
                     <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Penyewa</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Unit</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Bayar</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Total</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Opsi</th>
@@ -269,7 +293,7 @@ export default function LaporanKeuangan() {
             <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl mt-2">
               <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shrink-0">
                 <span className="text-secondary font-bold text-xl">
-                  {selectedItem.penyewa.charAt(0).toUpperCase()}
+                  {selectedItem.penyewa?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -291,8 +315,8 @@ export default function LaporanKeuangan() {
                   Biaya Sewa
                 </span>
                 <div className="flex justify-between text-sm font-semibold text-primary">
-                  <span>Periode (hari)</span>
-                  <span>{selectedItem.periode} hari</span>
+                  <span>Periode</span>
+                  <span>{selectedItem.periode || 30} hari</span>
                 </div>
                 <div className="flex justify-between text-sm font-semibold text-primary">
                   <span>Kamar</span>
@@ -321,7 +345,7 @@ export default function LaporanKeuangan() {
 
               <div className="flex flex-col gap-1 border-t border-gray-100 pt-4">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">
-                  Dibayar Pada
+                  Tanggal
                 </span>
                 <span className="text-primary font-bold text-lg">
                   {formatTanggal(selectedItem.tglDibayar)}
@@ -329,9 +353,6 @@ export default function LaporanKeuangan() {
               </div>
             </div>
 
-            <button className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer">
-              Lihat Bukti Pembayaran
-            </button>
           </div>
         )}
       </Modal>

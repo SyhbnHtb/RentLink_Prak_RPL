@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import * as authService from "../services/authService";
 
 const AuthContext = createContext();
 
@@ -9,51 +10,38 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Mock check for existing session
+    // Check for existing session
     const storedUser = localStorage.getItem("rentlink_user");
-    if (storedUser) {
+    const accessToken = localStorage.getItem("rentlink_access_token");
+    if (storedUser && accessToken) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
         localStorage.removeItem("rentlink_user");
+        localStorage.removeItem("rentlink_access_token");
+        localStorage.removeItem("rentlink_refresh_token");
       }
     }
     setLoading(false);
   }, []);
 
-// Daftar akun mock yang terdaftar
-const MOCK_ACCOUNTS = [
-  { username: "admin",  password: "admin123",  name: "Admin",  email: "admin@rentlink.com",  role: "admin" },
-  { username: "nasir",  password: "nasir123",  name: "Nasir",  email: "nasir@rentlink.com",  role: "user"  },
-  { username: "rusdi",  password: "rusdi123",  name: "Rusdi",  email: "rusdi@rentlink.com",  role: "user"  },
-];
+  const login = async (email, password) => {
+    const result = await authService.login(email, password);
 
-  const login = async (username, password) => {
-    // In the future, this will be an API call:
-    // const response = await axios.post("/api/login", { username, password });
-    
-    // Cari akun yang cocok dengan username dan password
-    const found = MOCK_ACCOUNTS.find(
-      (acc) =>
-        acc.username.toLowerCase() === username?.toLowerCase() &&
-        acc.password === password
-    );
-
-    if (!found) {
-      return { success: false, message: "Username atau password salah." };
+    if (!result.success) {
+      return { success: false, message: result.message };
     }
 
-    const mockUser = {
-      username: found.username,
-      name: found.name,
-      email: found.email,
-      role: found.role,
-    };
+    const { id_user, name, role, accessToken, refreshToken } = result.data;
+    
+    // Store user info and tokens
+    const loggedUser = { id_user, name, email: result.data.email, role };
+    setUser(loggedUser);
+    localStorage.setItem("rentlink_user", JSON.stringify(loggedUser));
+    localStorage.setItem("rentlink_access_token", accessToken);
+    localStorage.setItem("rentlink_refresh_token", refreshToken);
 
-    setUser(mockUser);
-    localStorage.setItem("rentlink_user", JSON.stringify(mockUser));
-
-    if (mockUser.role === "admin") {
+    if (role === "admin") {
       navigate("/admin");
     } else {
       navigate("/group-user");
@@ -62,9 +50,15 @@ const MOCK_ACCOUNTS = [
     return { success: true };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Call backend to invalidate refresh token
+    await authService.logout();
+    
+    // Clear local state
     setUser(null);
     localStorage.removeItem("rentlink_user");
+    localStorage.removeItem("rentlink_access_token");
+    localStorage.removeItem("rentlink_refresh_token");
     navigate("/login");
   };
 

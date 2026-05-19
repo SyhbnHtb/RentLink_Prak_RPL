@@ -2,30 +2,41 @@
  * kontrakService.js
  *
  * Service layer untuk Manajemen Kontrak.
+ * Terhubung ke backend riil.
  */
 
-// TODO: import axios
-// const API = axios.create({ baseURL: '/api' });
-
-const MOCK_KONTRAK = [
-  { id: "C-001", namaUnit: "Kamar 201", lantai: 2, penyewa: "Rusdi",  tanggalMulai: "11 September 2026", tanggalSelesai: "18 September 2026", status: "Aktif" },
-  { id: "C-002", namaUnit: "Kamar 102", lantai: 1, penyewa: "Nasir",  tanggalMulai: "1 April 2026",      tanggalSelesai: "11 April 2026",     status: "Selesai" },
-];
+import api from './api';
 
 export async function getKontraks() {
-  // TODO: return (await API.get('/kontrak')).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return [...MOCK_KONTRAK];
+  try {
+    const response = await api.get('/kontrak');
+    const kontraks = response.data.data;
+    
+    return kontraks.map(k => ({
+      id: k.id_kontrak,
+      userId: k.user_id,
+      unitId: k.unit_id,
+      namaUnit: k.nama_unit,
+      lantai: k.lantai || "-",
+      penyewa: k.nama_penyewa,
+      emailPenyewa: k.email_penyewa,
+      tglMulai: k.tgl_mulai,
+      tglSelesai: k.tgl_akhir,
+      status: k.status === 'aktif' ? 'Aktif' : 'Selesai'
+    }));
+  } catch (error) {
+    console.error("Gagal mengambil data kontrak", error);
+    return [];
+  }
 }
 
 export async function createKontrak(data) {
-  // TODO: return (await API.post('/kontrak', data)).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return { ...data, id: `C-${Date.now()}` };
+  // data format required by backend: { user_id, unit_id, tgl_mulai, tgl_akhir }
+  const response = await api.post('/kontrak', data);
+  return response.data.data;
 }
 
 export async function endKontrak(id) {
-  // TODO: return (await API.put(`/kontrak/${id}/end`)).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return { success: true };
+  const response = await api.put(`/kontrak/${id}/akhiri`);
+  return response.data.data;
 }

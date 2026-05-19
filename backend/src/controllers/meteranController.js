@@ -269,10 +269,32 @@ const deleteMeteran = async (req, res) => {
     }
 };
 
+// GET /api/meteran/me
+const getMeteranSaya = async (req, res) => {
+    try {
+        const userId = req.user.id_user;
+        const meteran = await meteranModel.getMeteranByUserId(userId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Berhasil mengambil data meteran saya',
+            data: meteran
+        });
+    } catch (error) {
+        console.error('Error getMeteranSaya:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil data meteran',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     getAllMeteran,
     getMeteranById,
     createMeteran,
     updateMeteran,
-    deleteMeteran
+    deleteMeteran,
+    getMeteranSaya
 };

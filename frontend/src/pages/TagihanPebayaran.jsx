@@ -2,17 +2,34 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import * as tagService from "../services/tagService";
 
 export default function TagihanPebayaran() {
   const navigate = useNavigate();
-  const { data, filters, handleFilterChange, setData, sortConfig, handleSort } = useTableFilter(MOCK_TAGIHAN);
+  const { data, filters, handleFilterChange, setData, sortConfig, handleSort } = useTableFilter([]);
   const [selectedTagihan, setSelectedTagihan] = useState(null);
   const [actionType, setActionType] = useState(null); // 'detail', 'delete'
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchTagihan = async () => {
+    setIsLoading(true);
+    try {
+      const tagihanList = await tagService.getTagihan();
+      setData(tagihanList || []);
+    } catch (e) {
+      console.error("Gagal memuat tagihan", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTagihan();
+  }, []);
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -24,7 +41,7 @@ export default function TagihanPebayaran() {
   };
 
   const formatTanggal = (dateString) => {
-    if (!dateString) return "-";
+    if (!dateString || dateString === "-") return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
@@ -43,10 +60,19 @@ export default function TagihanPebayaran() {
     setActionType("delete");
   };
 
-  const confirmDelete = () => {
-    setData(data.filter(item => item.id !== selectedTagihan.id));
-    setActionType(null);
-    setSelectedTagihan(null);
+  const confirmDelete = async () => {
+    if (!selectedTagihan) return;
+    setIsLoading(true);
+    try {
+      await tagService.deleteTagihan(selectedTagihan.id);
+      await fetchTagihan();
+      setActionType(null);
+      setSelectedTagihan(null);
+    } catch (e) {
+      console.error("Gagal menghapus tagihan", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -105,7 +131,12 @@ export default function TagihanPebayaran() {
           </div>
 
           {/* Table */}
-          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
@@ -182,8 +213,8 @@ export default function TagihanPebayaran() {
                   <div className="flex flex-col gap-1 border-t border-gray-100 pt-4 mt-2">
                     <span className="text-primary/70 text-xs font-bold uppercase tracking-wider mb-2">Biaya Sewa</span>
                     <div className="flex justify-between text-sm font-semibold text-primary">
-                      <span>Periode (hari)</span>
-                      <span>{selectedTagihan.periode} hari</span>
+                      <span>Periode</span>
+                      <span>{selectedTagihan.periode}</span>
                     </div>
                     <div className="flex justify-between text-sm font-semibold text-primary">
                       <span>Kamar</span>
@@ -208,10 +239,6 @@ export default function TagihanPebayaran() {
                     <span className="text-primary font-bold text-lg">{formatTanggal(selectedTagihan.tglDibayar)}</span>
                   </div>
                 </div>
-
-                <button className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer">
-                  Lihat Bukti Pembayaran
-                </button>
 
                 {selectedTagihan.status === "Menunggu Konfirmasi" && (
                   <button
@@ -238,8 +265,10 @@ export default function TagihanPebayaran() {
                 <h2 className="text-gray-900 font-bold text-xl mb-1">Hapus Tagihan?</h2>
                 <p className="text-gray-500 text-sm mb-4">Tagihan ini akan dihapus dan dipindahkan ke riwayat.</p>
                 <div className="flex flex-col gap-3 w-full">
-                  <button onClick={confirmDelete} className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer">Ya, Hapus</button>
-                  <button onClick={() => setActionType(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer">Batal</button>
+                  <button disabled={isLoading} onClick={confirmDelete} className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">
+                    {isLoading ? "Menghapus..." : "Ya, Hapus"}
+                  </button>
+                  <button disabled={isLoading} onClick={() => setActionType(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">Batal</button>
                 </div>
               </div>
             )}
