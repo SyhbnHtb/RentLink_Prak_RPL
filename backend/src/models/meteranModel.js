@@ -1,7 +1,7 @@
 // backend\backend\src\models\meteranModel.js
 const pool = require('../config/db');
 
-// Ambil semua data meteran dengan detail unit
+// Ambil semua data meteran dengan detail unit dan penyewa
 const getAllMeteran = async () => {
     const result = await pool.query(
         `SELECT 
@@ -9,14 +9,19 @@ const getAllMeteran = async () => {
             m.unit_id,
             u.nama_unit,
             u.tipe,
+            u.lantai,
+            u.harga,
             m.bulan,
             m.tahun,
             m.meter_listrik_awal,
             m.meter_listrik_akhir,
             m.meter_air_awal,
-            m.meter_air_akhir
+            m.meter_air_akhir,
+            us.name AS nama_penyewa
          FROM meteran m
          JOIN unit u ON m.unit_id = u.id_unit
+         LEFT JOIN kontrak k ON m.unit_id = k.unit_id AND k.status = 'aktif'
+         LEFT JOIN users us ON k.user_id = us.id_user
          ORDER BY m.tahun DESC, m.id_meteran DESC`
     );
 

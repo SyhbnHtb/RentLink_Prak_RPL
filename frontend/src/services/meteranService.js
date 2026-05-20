@@ -7,17 +7,20 @@ export async function getMeteran() {
     
     return data.map(m => ({
       id: m.id_meteran,
+      unitId: m.unit_id,
       namaUnit: m.nama_unit,
+      lantai: m.lantai,
+      harga: m.harga,
       penyewa: m.nama_penyewa || "Kosong",
       bulan: m.bulan,
       tahun: m.tahun,
-      listrikAwal: m.listrik_awal,
-      listrikAkhir: m.listrik_akhir,
-      airAwal: m.air_awal,
-      airAkhir: m.air_akhir,
+      listrikAwal: m.meter_listrik_awal,
+      listrikAkhir: m.meter_listrik_akhir,
+      airAwal: m.meter_air_awal,
+      airAkhir: m.meter_air_akhir,
       // Calculate usage locally for display
-      listrikPakai: m.listrik_akhir - m.listrik_awal,
-      airPakai: m.air_akhir - m.air_awal
+      listrikPakai: m.meter_listrik_akhir - m.meter_listrik_awal,
+      airPakai: m.meter_air_akhir - m.meter_air_awal
     }));
   } catch (error) {
     console.error("Gagal mengambil data meteran", error);

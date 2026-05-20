@@ -22,9 +22,9 @@ export default function UserKontrak() {
           namaUnit: k.nama_unit,
           tglMulai: k.tgl_mulai,
           tglSelesai: k.tgl_akhir,
-          status: k.status === 'aktif' ? 'Aktif' : (k.status === 'selesai' ? 'Selesai' : 'Dibatalkan'),
+          status: k.status_kontrak === 'aktif' ? 'Aktif' : (k.status_kontrak === 'selesai' ? 'Selesai' : 'Dibatalkan'),
           penyewa: userName,
-          lantai: k.lantai || "1",
+          lantai: k.lantai?.toString() || "-",
           penyewaDetail: null
         }));
         setUserKontrak(formattedData);

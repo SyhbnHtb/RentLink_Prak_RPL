@@ -36,6 +36,16 @@ export async function createKontrak(data) {
   return response.data.data;
 }
 
+export async function updateKontrak(id, data) {
+  const response = await api.put(`/kontrak/${id}`, data);
+  return response.data.data;
+}
+
+export async function deleteKontrak(id) {
+  const response = await api.delete(`/kontrak/${id}`);
+  return response.data;
+}
+
 export async function endKontrak(id) {
   const response = await api.put(`/kontrak/${id}/akhiri`);
   return response.data.data;

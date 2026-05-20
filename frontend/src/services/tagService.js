@@ -15,7 +15,7 @@ export async function getTagihan() {
     return tagihanData.map(t => {
       let mappedStatus = "Belum Bayar";
       if (t.status === 'lunas') mappedStatus = "Approved";
-      else if (t.status === 'menunggu konfirmasi') mappedStatus = "Menunggu Konfirmasi"; // Assuming backend might have this
+      else if (t.status === 'pending') mappedStatus = "Menunggu Konfirmasi";
       else if (t.status === 'belum') mappedStatus = "Belum Bayar";
       
       return {
@@ -46,7 +46,7 @@ export async function getTagihanSaya() {
     return tagihanData.map(t => {
       let mappedStatus = "Belum Bayar";
       if (t.status === 'lunas') mappedStatus = "Approved";
-      else if (t.status === 'menunggu konfirmasi') mappedStatus = "Menunggu Konfirmasi";
+      else if (t.status === 'pending') mappedStatus = "Menunggu Konfirmasi";
       else if (t.status === 'belum') mappedStatus = "Belum Bayar";
       
       return {

@@ -15,6 +15,7 @@ export default function ManagementUnit() {
   // Form state
   const [formNama, setFormNama] = useState("");
   const [formLantai, setFormLantai] = useState("");
+  const [formHarga, setFormHarga] = useState("");
   const [isLantaiDropdownOpen, setIsLantaiDropdownOpen] = useState(false);
 
   const fetchUnits = async () => {
@@ -46,6 +47,7 @@ export default function ManagementUnit() {
     setActionType("edit");
     setFormNama(unit.nama);
     setFormLantai(unit.lantai);
+    setFormHarga(unit.harga?.toString() || "");
   };
 
   const handleDeleteClick = (unit) => {
@@ -58,10 +60,11 @@ export default function ManagementUnit() {
     setActionType("create");
     setFormNama("");
     setFormLantai("");
+    setFormHarga("");
   };
 
   const handleSaveForm = async () => {
-    if (!formNama || !formLantai) return;
+    if (!formNama || !formLantai || !formHarga) return;
     
     setIsLoading(true);
     try {
@@ -69,14 +72,14 @@ export default function ManagementUnit() {
         await unitService.createUnit({
           nama: formNama,
           lantai: formLantai,
-          harga: 200000,
+          harga: Number(formHarga),
           status: "Tersedia"
         });
       } else if (actionType === "edit") {
         await unitService.updateUnit(selectedUnit.id, {
           nama: formNama,
           lantai: formLantai,
-          harga: selectedUnit.harga,
+          harga: Number(formHarga),
           status: selectedUnit.status
         });
       }
@@ -85,6 +88,7 @@ export default function ManagementUnit() {
       setActionType(null);
       setFormNama("");
       setFormLantai("");
+      setFormHarga("");
     } catch (e) {
       console.error("Gagal menyimpan unit:", e);
     } finally {
@@ -243,6 +247,17 @@ export default function ManagementUnit() {
                       ))}
                     </div>
                   )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Harga Sewa (Rp)</label>
+                  <input 
+                    type="number" 
+                    value={formHarga}
+                    onChange={(e) => setFormHarga(e.target.value)}
+                    placeholder="Masukkan harga sewa..." 
+                    className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-gray-800 font-sans outline-none focus:ring-2 focus:ring-primary/50" 
+                  />
                 </div>
 
                 <button 

@@ -17,10 +17,10 @@ export async function getPenyewa() {
       name: u.name,
       email: u.email,
       telepon: u.phone || "-",
-      ktp: u.nik || "-",
-      asal: u.asal_kota || "-",
+      ktp: u.ktp || "-",
+      asal: u.asal || "-",
       unit: u.nama_unit || "-",
-      status: "Aktif" // Backend query returns those with unit or all? We'll default to "Aktif" if they have a unit.
+      status: u.status_sewa === 'aktif' ? "Aktif" : "Tidak Aktif"
     }));
   } catch (error) {
     console.error("Gagal mengambil data penyewa", error);
@@ -40,7 +40,7 @@ export async function getPenyewaById(id) {
 
 export async function updateProfil(data) {
   // Update profile via /profile
-  const response = await api.put('/profile', data);
+  const response = await api.put('/profile/me', data);
   return response.data;
 }
 

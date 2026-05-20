@@ -1,13 +1,17 @@
 //backend\backend\src\models\penyewaModel.js
 const pool = require('../config/db');
 
-// Ambil semua user dengan role penyewa
+// Ambil semua user dengan role penyewa beserta unit aktif
 const getAllPenyewa = async () => {
     const result = await pool.query(
-        `SELECT id_user, name, email, role, phone
-         FROM users
-         WHERE role = 'penyewa'
-         ORDER BY id_user ASC`
+        `SELECT u.id_user, u.name, u.email, u.role, u.phone, u.ktp, u.asal,
+                k.id_kontrak, un.nama_unit, un.lantai,
+                CASE WHEN k.id_kontrak IS NOT NULL THEN 'aktif' ELSE 'tidak_aktif' END AS status_sewa
+         FROM users u
+         LEFT JOIN kontrak k ON u.id_user = k.user_id AND k.status = 'aktif'
+         LEFT JOIN unit un ON k.unit_id = un.id_unit
+         WHERE u.role = 'penyewa'
+         ORDER BY u.id_user ASC`
     );
 
     return result.rows;

@@ -148,7 +148,7 @@ export default function GroupUser() {
                         <StatusBadge variant={tagihan.status} />
                       </td>
                       <td className="py-4 px-6 text-center space-x-4">
-                        <a href="/user/tagihan" className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Lihat Tagihan</a>
+                        <a href="/group-user/tagihan" className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Lihat Tagihan</a>
                       </td>
                     </tr>
                   )) : (
@@ -191,7 +191,7 @@ export default function GroupUser() {
                         <StatusBadge variant={riwayat.status === 'lunas' ? 'Selesai' : 'Ditolak'} />
                       </td>
                       <td className="py-4 px-6 text-center space-x-4">
-                        <a href="/user/tagihan" className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</a>
+                        <a href="/group-user/tagihan" className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</a>
                       </td>
                     </tr>
                   )) : (

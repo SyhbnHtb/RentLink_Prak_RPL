@@ -4,7 +4,7 @@ import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
 import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import * as tagService from "../services/tagService";
+import api from "../services/api";
 
 export default function LaporanKeuangan() {
   const { data, filters, handleFilterChange, sortConfig, handleSort, setData } =
@@ -12,23 +12,53 @@ export default function LaporanKeuangan() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [tagihanList, setTagihanList] = useState([]);
+  const [ringkasan, setRingkasan] = useState(null);
+
+  const fetchLaporan = async (filterBulan, filterTahun) => {
+    setIsLoading(true);
+    try {
+      const params = {};
+      if (filterBulan && filterBulan !== 'All') params.bulan = filterBulan;
+      if (filterTahun && filterTahun !== 'All') params.tahun = filterTahun;
+      // Only pass both or neither
+      if ((params.bulan && !params.tahun) || (!params.bulan && params.tahun)) {
+        // Need both bulan and tahun for the API
+        if (!params.bulan) delete params.tahun;
+        if (!params.tahun) delete params.bulan;
+      }
+      const response = await api.get('/laporan/keuangan', { params });
+      if (response.data.success) {
+        setRingkasan(response.data.data.ringkasan);
+        const laporan = response.data.data.laporan || [];
+        const mapped = laporan.map(l => ({
+          id: l.kode_invoice || `INV-${String(l.tagihan_id).padStart(3, '0')}`,
+          penyewa: l.nama_penyewa,
+          namaUnit: l.nama_unit,
+          tglDibayar: l.tanggal,
+          kamar: Number(l.biaya_sewa),
+          listrik: Number(l.biaya_listrik),
+          air: Number(l.biaya_air),
+          total: Number(l.total),
+          status: "Approved",
+          periode: l.periode
+        }));
+        setData(mapped);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil laporan keuangan", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTagihan = async () => {
-      setIsLoading(true);
-      try {
-        const tagihanData = await tagService.getTagihan();
-        setTagihanList(tagihanData || []);
-        setData(tagihanData || []);
-      } catch (error) {
-        console.error("Gagal mengambil tagihan", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTagihan();
-  }, [setData]);
+    fetchLaporan(filters.bulan, filters.tahun);
+  }, [filters.bulan, filters.tahun]);
+
+  const totalPemasukan = ringkasan ? ringkasan.total_pemasukan : 0;
+  const totalBelumLunas = 0; // Laporan keuangan only shows lunas
+  const totalUnitAktif = ringkasan ? ringkasan.jumlah_transaksi : 0;
+  const totalSelesai = ringkasan ? ringkasan.jumlah_transaksi : 0;
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -47,23 +77,6 @@ export default function LaporanKeuangan() {
       year: "numeric",
     });
   };
-
-  // Hitung summary dari tagihanList
-  const totalPemasukan = tagihanList.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai" || t.status === "lunas"
-  ).reduce((sum, t) => sum + (t.total || 0), 0);
-
-  const totalBelumLunas = tagihanList.filter(
-    (t) => t.status === "Belum Bayar" || t.status === "belum" || t.status === "Menunggu Konfirmasi"
-  ).reduce((sum, t) => sum + (t.total || 0), 0);
-
-  const totalUnitAktif = new Set(
-    tagihanList.map((t) => t.namaUnit)
-  ).size;
-
-  const totalSelesai = tagihanList.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai" || t.status === "lunas"
-  ).length;
 
   return (
     <AdminLayout title="Laporan Keuangan">

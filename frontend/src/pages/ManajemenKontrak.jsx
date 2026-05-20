@@ -1,6 +1,7 @@
 import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
+import ConfirmDialog from "../components/ConfirmDialog";
 import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
 import * as kontrakService from "../services/kontrakService";
@@ -10,7 +11,7 @@ import * as userService from "../services/userService";
 export default function ManajemenKontrak() {
   const { data, filters, handleFilterChange, setData } = useTableFilter([]);
   const [selectedKontrak, setSelectedKontrak] = useState(null);
-  const [actionType, setActionType] = useState(null); // 'create', 'detail'
+  const [actionType, setActionType] = useState(null); // 'create', 'detail', 'delete'
   const [isLoading, setIsLoading] = useState(false);
   
   // Available units and users for dropdowns
@@ -114,6 +115,27 @@ export default function ManajemenKontrak() {
     }
   };
 
+  const handleDeleteClick = (kontrak) => {
+    setSelectedKontrak(kontrak);
+    setActionType("delete");
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedKontrak) return;
+    setIsLoading(true);
+    try {
+      await kontrakService.deleteKontrak(selectedKontrak.id);
+      await fetchKontrak();
+      await fetchDropdownData();
+      setActionType(null);
+      setSelectedKontrak(null);
+    } catch (e) {
+      console.error("Gagal menghapus kontrak", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const formatTanggal = (dateString) => {
     if (!dateString || dateString === "-") return "-";
     const date = new Date(dateString);
@@ -209,6 +231,9 @@ export default function ManajemenKontrak() {
                         {kontrak.status === "Aktif" && (
                           <button onClick={() => handleEndKontrak(kontrak.id)} className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Akhiri</button>
                         )}
+                        {kontrak.status === "Selesai" && (
+                          <button onClick={() => handleDeleteClick(kontrak)} className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Hapus</button>
+                        )}
                       </td>
                     </tr>
                   )) : (
@@ -223,8 +248,17 @@ export default function ManajemenKontrak() {
         </div>
 
         {/* Side Panel (Forms & Actions) */}
-        {(actionType === "create" || actionType === "detail") && (
+        {(actionType === "create" || actionType === "detail" || actionType === "delete") && (
           <div className="w-full xl:w-96 flex flex-col gap-6 shrink-0">
+
+            {/* Delete Confirmation */}
+            {actionType === "delete" && selectedKontrak && (
+              <ConfirmDialog 
+                title={`Hapus kontrak ${selectedKontrak.namaUnit} - ${selectedKontrak.penyewa}?`}
+                onConfirm={confirmDelete}
+                onCancel={() => { setActionType(null); setSelectedKontrak(null); }}
+              />
+            )}
             
             {/* Detail Kontrak */}
             {actionType === "detail" && selectedKontrak && (

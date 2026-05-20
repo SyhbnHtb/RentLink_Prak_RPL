@@ -31,7 +31,7 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('rentlink_refresh_token');
         if (refreshToken) {
-          const res = await axios.post('http://localhost:5000/api/auth/refresh-token', { refreshToken });
+          const res = await axios.post('http://localhost:5001/api/auth/refresh-token', { refreshToken });
           if (res.data.success) {
             localStorage.setItem('rentlink_access_token', res.data.data.accessToken);
             // Retry the original request with the new token

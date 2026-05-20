@@ -219,7 +219,7 @@ export default function VerifikasiPembayaran() {
                 {selectedInvoice.bukti ? (
                   <div className="w-full rounded-xl overflow-hidden border border-gray-200">
                     <img 
-                      src={`http://localhost:5000${selectedInvoice.bukti}`} 
+                      src={`http://localhost:5001${selectedInvoice.bukti}`} 
                       alt="Bukti Bayar" 
                       className="w-full h-auto object-contain max-h-64"
                       onError={(e) => {
@@ -239,7 +239,7 @@ export default function VerifikasiPembayaran() {
               </div>
 
               <a 
-                href={`http://localhost:5000${selectedInvoice.bukti}`} 
+                href={`http://localhost:5001${selectedInvoice.bukti}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors cursor-pointer text-center block"

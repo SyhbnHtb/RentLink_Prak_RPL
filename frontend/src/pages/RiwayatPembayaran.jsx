@@ -207,7 +207,7 @@ export default function RiwayatPembayaran() {
 
               {selectedRiwayat.bukti ? (
                 <a 
-                  href={`http://localhost:5000${selectedRiwayat.bukti}`} 
+                  href={`http://localhost:5001${selectedRiwayat.bukti}`} 
                   target="_blank" 
                   rel="noreferrer"
                   className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer text-center block"
