@@ -64,10 +64,14 @@ export default function ManajemenMeteran() {
 
   const handleEditClick = (meteran) => {
     setSelectedMeteran(meteran);
-    setActionType("edit");
+    if (!meteran.id) {
+      setActionType("create");
+    } else {
+      setActionType("edit");
+    }
     setFormUnit(meteran.unitId);
-    setFormBulan(meteran.bulan);
-    setFormTahun(meteran.tahun?.toString() || "");
+    setFormBulan(meteran.bulan || "");
+    setFormTahun(meteran.tahun?.toString() || new Date().getFullYear().toString());
     setFormListrikAwal(meteran.listrikAwal?.toString() || "");
     setFormListrikAkhir(meteran.listrikAkhir?.toString() || "");
     setFormAirAwal(meteran.airAwal?.toString() || "");
@@ -186,22 +190,24 @@ export default function ManajemenMeteran() {
                         <div>{meteran.namaUnit}</div>
                         <div className="text-xs text-gray-400">Lt. {meteran.lantai || "-"}</div>
                       </td>
-                      <td className="py-4 px-5 text-gray-800">{meteran.bulan} {meteran.tahun}</td>
+                      <td className="py-4 px-5 text-gray-800">{meteran.bulan || "-"} {meteran.tahun || ""}</td>
                       <td className="py-4 px-5 text-gray-800">{meteran.penyewa}</td>
                       <td className="py-4 px-5 text-gray-800">
-                        <div>{meteran.listrikPakai ?? "-"} kWh</div>
-                        <div className="text-xs text-gray-400">{meteran.listrikAwal} → {meteran.listrikAkhir}</div>
+                        <div>{meteran.listrikPakai != null ? meteran.listrikPakai : "-"} kWh</div>
+                        <div className="text-xs text-gray-400">{meteran.listrikAwal || "-"} → {meteran.listrikAkhir || "-"}</div>
                       </td>
                       <td className="py-4 px-5 text-gray-800">
-                        <div>{meteran.airPakai ?? "-"} m³</div>
-                        <div className="text-xs text-gray-400">{meteran.airAwal} → {meteran.airAkhir}</div>
+                        <div>{meteran.airPakai != null ? meteran.airPakai : "-"} m³</div>
+                        <div className="text-xs text-gray-400">{meteran.airAwal || "-"} → {meteran.airAkhir || "-"}</div>
                       </td>
                       <td className="py-4 px-5">
                         <div className="text-gray-800 font-semibold">{formatRupiah(totalEstimasi)}</div>
                         <div className="text-xs text-gray-400">L: {formatRupiah(biayaListrik)} · A: {formatRupiah(biayaAir)}</div>
                       </td>
                       <td className="py-4 px-5 text-center">
-                        <button onClick={() => handleEditClick(meteran)} className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Edit</button>
+                        <button onClick={() => handleEditClick(meteran)} className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">
+                          {meteran.id ? "Edit" : "Tambah"}
+                        </button>
                       </td>
                     </tr>
                   )}) : (
@@ -251,7 +257,7 @@ export default function ManajemenMeteran() {
               ) : (
                 <div className="flex flex-col gap-1">
                   <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">Unit</span>
-                  <span className="text-primary font-bold text-lg">{selectedMeteran?.namaUnit}</span>
+                  <span className="text-primary font-bold text-lg">{selectedMeteran?.namaUnit || "Pilih Unit..."}</span>
                 </div>
               )}
 

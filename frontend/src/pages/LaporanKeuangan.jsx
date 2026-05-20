@@ -39,7 +39,7 @@ export default function LaporanKeuangan() {
           listrik: Number(l.biaya_listrik),
           air: Number(l.biaya_air),
           total: Number(l.total),
-          status: "Approved",
+          status: l.status_tagihan === 'lunas' ? "Approved" : (l.status_tagihan === 'pending' ? "Menunggu Konfirmasi" : "Belum Bayar"),
           periode: l.periode
         }));
         setData(mapped);
@@ -56,8 +56,8 @@ export default function LaporanKeuangan() {
   }, [filters.bulan, filters.tahun]);
 
   const totalPemasukan = ringkasan ? ringkasan.total_pemasukan : 0;
-  const totalBelumLunas = 0; // Laporan keuangan only shows lunas
-  const totalUnitAktif = ringkasan ? ringkasan.jumlah_transaksi : 0;
+  const totalBelumLunas = ringkasan ? ringkasan.total_belum_lunas : 0;
+  const totalUnitAktif = ringkasan ? ringkasan.jumlah_unit_tertagih : 0;
   const totalSelesai = ringkasan ? ringkasan.jumlah_transaksi : 0;
 
   const formatRupiah = (number) => {

@@ -14,13 +14,13 @@ export async function getMeteran() {
       penyewa: m.nama_penyewa || "Kosong",
       bulan: m.bulan,
       tahun: m.tahun,
-      listrikAwal: m.meter_listrik_awal,
-      listrikAkhir: m.meter_listrik_akhir,
-      airAwal: m.meter_air_awal,
-      airAkhir: m.meter_air_akhir,
+      listrikAwal: m.meter_listrik_awal ?? "",
+      listrikAkhir: m.meter_listrik_akhir ?? "",
+      airAwal: m.meter_air_awal ?? "",
+      airAkhir: m.meter_air_akhir ?? "",
       // Calculate usage locally for display
-      listrikPakai: m.meter_listrik_akhir - m.meter_listrik_awal,
-      airPakai: m.meter_air_akhir - m.meter_air_awal
+      listrikPakai: m.meter_listrik_akhir != null ? m.meter_listrik_akhir - m.meter_listrik_awal : null,
+      airPakai: m.meter_air_akhir != null ? m.meter_air_akhir - m.meter_air_awal : null
     }));
   } catch (error) {
     console.error("Gagal mengambil data meteran", error);

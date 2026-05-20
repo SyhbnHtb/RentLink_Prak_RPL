@@ -30,7 +30,9 @@ const getLaporanKeuangan = async (req, res) => {
                     total_biaya_sewa: Number(ringkasan.total_biaya_sewa),
                     total_biaya_listrik: Number(ringkasan.total_biaya_listrik),
                     total_biaya_air: Number(ringkasan.total_biaya_air),
-                    total_pemasukan: Number(ringkasan.total_pemasukan)
+                    total_pemasukan: Number(ringkasan.total_pemasukan),
+                    total_belum_lunas: Number(ringkasan.total_belum_lunas),
+                    jumlah_unit_tertagih: Number(ringkasan.jumlah_unit_tertagih)
                 },
                 laporan
             }

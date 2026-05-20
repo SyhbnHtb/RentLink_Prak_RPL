@@ -6,7 +6,7 @@ const getAllMeteran = async () => {
     const result = await pool.query(
         `SELECT 
             m.id_meteran,
-            m.unit_id,
+            u.id_unit AS unit_id,
             u.nama_unit,
             u.tipe,
             u.lantai,
@@ -18,11 +18,11 @@ const getAllMeteran = async () => {
             m.meter_air_awal,
             m.meter_air_akhir,
             us.name AS nama_penyewa
-         FROM meteran m
-         JOIN unit u ON m.unit_id = u.id_unit
-         LEFT JOIN kontrak k ON m.unit_id = k.unit_id AND k.status = 'aktif'
+         FROM unit u
+         LEFT JOIN meteran m ON u.id_unit = m.unit_id
+         LEFT JOIN kontrak k ON u.id_unit = k.unit_id AND k.status = 'aktif'
          LEFT JOIN users us ON k.user_id = us.id_user
-         ORDER BY m.tahun DESC, m.id_meteran DESC`
+         ORDER BY m.tahun DESC NULLS LAST, m.id_meteran DESC NULLS LAST, u.id_unit ASC`
     );
 
     return result.rows;
