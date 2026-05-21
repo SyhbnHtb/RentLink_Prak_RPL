@@ -1,23 +1,28 @@
 // backend\backend\src\models\meteranModel.js
 const pool = require('../config/db');
 
-// Ambil semua data meteran dengan detail unit
+// Ambil semua data meteran dengan detail unit dan penyewa
 const getAllMeteran = async () => {
     const result = await pool.query(
         `SELECT 
             m.id_meteran,
-            m.unit_id,
+            u.id_unit AS unit_id,
             u.nama_unit,
             u.tipe,
+            u.lantai,
+            u.harga,
             m.bulan,
             m.tahun,
             m.meter_listrik_awal,
             m.meter_listrik_akhir,
             m.meter_air_awal,
-            m.meter_air_akhir
-         FROM meteran m
-         JOIN unit u ON m.unit_id = u.id_unit
-         ORDER BY m.tahun DESC, m.id_meteran DESC`
+            m.meter_air_akhir,
+            us.name AS nama_penyewa
+         FROM unit u
+         LEFT JOIN meteran m ON u.id_unit = m.unit_id
+         LEFT JOIN kontrak k ON u.id_unit = k.unit_id AND k.status = 'aktif'
+         LEFT JOIN users us ON k.user_id = us.id_user
+         ORDER BY m.tahun DESC NULLS LAST, m.id_meteran DESC NULLS LAST, u.id_unit ASC`
     );
 
     return result.rows;
@@ -157,6 +162,31 @@ const deleteMeteran = async (id_meteran) => {
     return result.rows[0];
 };
 
+// Ambil data meteran berdasarkan user (penyewa)
+const getMeteranByUserId = async (user_id) => {
+    const result = await pool.query(
+        `SELECT 
+            m.id_meteran,
+            m.unit_id,
+            u.nama_unit,
+            u.tipe,
+            m.bulan,
+            m.tahun,
+            m.meter_listrik_awal,
+            m.meter_listrik_akhir,
+            m.meter_air_awal,
+            m.meter_air_akhir
+         FROM meteran m
+         JOIN unit u ON m.unit_id = u.id_unit
+         JOIN kontrak k ON m.unit_id = k.unit_id
+         WHERE k.user_id = $1 AND k.status = 'aktif'
+         ORDER BY m.tahun DESC, m.id_meteran DESC`,
+        [user_id]
+    );
+
+    return result.rows;
+};
+
 module.exports = {
     getAllMeteran,
     getMeteranById,
@@ -164,5 +194,6 @@ module.exports = {
     getMeteranByUnitPeriode,
     createMeteran,
     updateMeteran,
-    deleteMeteran
+    deleteMeteran,
+    getMeteranByUserId
 };

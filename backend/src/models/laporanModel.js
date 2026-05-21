@@ -23,22 +23,21 @@ const getLaporanKeuangan = async (bulan, tahun) => {
             un.id_unit,
             un.nama_unit,
             un.tipe
-        FROM pembayaran p
-        JOIN tagihan t ON p.tagihan_id = t.id_tagihan
+        FROM tagihan t
+        LEFT JOIN pembayaran p ON t.id_tagihan = p.tagihan_id
         JOIN kontrak k ON t.kontrak_id = k.id_kontrak
         JOIN users u ON k.user_id = u.id_user
         JOIN unit un ON k.unit_id = un.id_unit
-        WHERE p.status = 'lunas'
     `;
 
     const values = [];
 
     if (bulan && tahun) {
         values.push(`${bulan} ${tahun}`);
-        query += ` AND LOWER(t.periode) = LOWER($${values.length})`;
+        query += ` WHERE LOWER(t.periode) = LOWER($${values.length})`;
     }
 
-    query += ` ORDER BY p.tanggal DESC, p.id_pembayaran DESC`;
+    query += ` ORDER BY COALESCE(p.tanggal, t.created_at) DESC, t.id_tagihan DESC`;
 
     const result = await pool.query(query, values);
     return result.rows;
@@ -48,14 +47,14 @@ const getLaporanKeuangan = async (bulan, tahun) => {
 const getRingkasanLaporanKeuangan = async (bulan, tahun) => {
     let query = `
         SELECT 
-            COUNT(p.id_pembayaran) AS jumlah_transaksi,
-            COALESCE(SUM(t.biaya_sewa), 0) AS total_biaya_sewa,
-            COALESCE(SUM(t.biaya_listrik), 0) AS total_biaya_listrik,
-            COALESCE(SUM(t.biaya_air), 0) AS total_biaya_air,
-            COALESCE(SUM(t.total), 0) AS total_pemasukan
-        FROM pembayaran p
-        JOIN tagihan t ON p.tagihan_id = t.id_tagihan
-        WHERE p.status = 'lunas'
+            COUNT(CASE WHEN t.status = 'lunas' THEN 1 END) AS jumlah_transaksi,
+            COALESCE(SUM(CASE WHEN t.status = 'lunas' THEN t.biaya_sewa END), 0) AS total_biaya_sewa,
+            COALESCE(SUM(CASE WHEN t.status = 'lunas' THEN t.biaya_listrik END), 0) AS total_biaya_listrik,
+            COALESCE(SUM(CASE WHEN t.status = 'lunas' THEN t.biaya_air END), 0) AS total_biaya_air,
+            COALESCE(SUM(CASE WHEN t.status = 'lunas' THEN t.total END), 0) AS total_pemasukan,
+            COALESCE(SUM(CASE WHEN t.status != 'lunas' THEN t.total END), 0) AS total_belum_lunas,
+            COUNT(t.id_tagihan) AS jumlah_unit_tertagih
+        FROM tagihan t
     `;
 
     const values = [];

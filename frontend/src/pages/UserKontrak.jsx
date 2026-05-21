@@ -1,14 +1,42 @@
 import UserLayout from "../components/UserLayout";
 import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../contexts/AuthContext";
-import { MOCK_KONTRAK } from "../utils/mockData";
+import { useState, useEffect } from "react";
+import * as userService from "../services/userService";
 
 export default function UserKontrak() {
   const { user } = useAuth();
-  const userName = user?.name || "Nasir";
+  const userName = user?.name || "Penyewa";
+  
+  const [userKontrak, setUserKontrak] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter kontrak milik user yang login
-  const userKontrak = MOCK_KONTRAK.filter((k) => k.penyewa === userName);
+  useEffect(() => {
+    const fetchKontrak = async () => {
+      setIsLoading(true);
+      try {
+        const data = await userService.getKontrakSaya();
+        // data contains: id_kontrak, kode_kontrak, nama_unit, tgl_mulai, tgl_akhir, status
+        const formattedData = data.map(k => ({
+          id: k.kode_kontrak || `C-${k.id_kontrak}`,
+          namaUnit: k.nama_unit,
+          tglMulai: k.tgl_mulai,
+          tglSelesai: k.tgl_akhir,
+          status: k.status_kontrak === 'aktif' ? 'Aktif' : (k.status_kontrak === 'selesai' ? 'Selesai' : 'Dibatalkan'),
+          penyewa: userName,
+          lantai: k.lantai?.toString() || "-",
+          penyewaDetail: null
+        }));
+        setUserKontrak(formattedData);
+      } catch (error) {
+        console.error("Gagal mengambil kontrak saya", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchKontrak();
+  }, [userName]);
+
   const kontrakAktif = userKontrak.find((k) => k.status === "Aktif");
 
   const formatTanggal = (dateString) => {
@@ -30,7 +58,13 @@ export default function UserKontrak() {
 
   return (
     <UserLayout title="Kontrak Saya">
-      <div className="flex flex-col gap-8 w-full max-w-4xl">
+      <div className="flex flex-col gap-8 w-full max-w-4xl relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[200px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
         {/* Kontrak Aktif */}
         {kontrakAktif ? (
           <div className="bg-surface rounded-2xl border-2 border-secondary shadow-lg p-8 flex flex-col gap-6">
@@ -144,29 +178,31 @@ export default function UserKontrak() {
             )}
           </div>
         ) : (
-          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-12 flex flex-col items-center gap-4 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
+          !isLoading && (
+            <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-12 flex flex-col items-center gap-4 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <p className="text-gray-500 font-medium">
+                Tidak ada kontrak aktif saat ini.
+              </p>
+              <p className="text-gray-400 text-sm">
+                Hubungi admin untuk informasi lebih lanjut.
+              </p>
             </div>
-            <p className="text-gray-500 font-medium">
-              Tidak ada kontrak aktif saat ini.
-            </p>
-            <p className="text-gray-400 text-sm">
-              Hubungi admin untuk informasi lebih lanjut.
-            </p>
-          </div>
+          )
         )}
 
         {/* Riwayat Kontrak */}

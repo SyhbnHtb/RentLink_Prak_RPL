@@ -2,36 +2,70 @@
  * userService.js
  *
  * Service layer untuk data pengguna (profil, daftar penyewa).
+ * Terhubung ke backend riil.
  */
 
-// TODO: import axios
-// const API = axios.create({ baseURL: '/api' });
-
-const MOCK_PENYEWA = [
-  { id: 2, nama: "Nasir",  username: "nasir",  email: "nasir@rentlink.com",  ktp: "910216769",  telepon: "0123456789", asal: "Ngawi",    unit: "Kamar 102", statusKontrak: "Aktif" },
-  { id: 3, nama: "Rusdi",  username: "rusdi",  email: "rusdi@rentlink.com",  ktp: "810315482",  telepon: "0987654321", asal: "Surabaya", unit: "Kamar 201", statusKontrak: "Aktif" },
-];
+import api from './api';
 
 export async function getPenyewa() {
-  // TODO: return (await API.get('/users?role=user')).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return [...MOCK_PENYEWA];
+  try {
+    const response = await api.get('/penyewa');
+    const users = response.data.data;
+    
+    return users.map(u => ({
+      id_user: u.id_user,
+      name: u.name,
+      email: u.email,
+      telepon: u.phone || "-",
+      ktp: u.ktp || "-",
+      asal: u.asal || "-",
+      unit: u.nama_unit || "-",
+      status: u.status_sewa === 'aktif' ? "Aktif" : "Tidak Aktif"
+    }));
+  } catch (error) {
+    console.error("Gagal mengambil data penyewa", error);
+    return [];
+  }
 }
 
 export async function getPenyewaById(id) {
-  // TODO: return (await API.get(`/users/${id}`)).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return MOCK_PENYEWA.find((p) => p.id === id) || null;
+  try {
+    const response = await api.get(`/penyewa/${id}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Gagal mengambil detail penyewa", error);
+    return null;
+  }
 }
 
-export async function updateProfil(id, data) {
-  // TODO: return (await API.put(`/users/${id}`, data)).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return { success: true, ...data };
+export async function updateProfil(data) {
+  // Update profile via /profile
+  const response = await api.put('/profile/me', data);
+  return response.data;
 }
 
 export async function deletePenyewa(id) {
-  // TODO: return (await API.delete(`/users/${id}`)).data;
-  await new Promise((r) => setTimeout(r, 300));
-  return { success: true };
+  const response = await api.delete(`/penyewa/${id}`);
+  return response.data;
 }
+
+export async function getKontrakSaya() {
+  try {
+    const response = await api.get('/penyewa/kontrak-saya');
+    return response.data.data;
+  } catch (error) {
+    console.error("Gagal mengambil kontrak saya", error);
+    return [];
+  }
+}
+
+export async function getUnitSaya() {
+  try {
+    const response = await api.get('/penyewa/unit-saya');
+    return response.data.data;
+  } catch (error) {
+    console.error("Gagal mengambil unit saya", error);
+    return null;
+  }
+}
+

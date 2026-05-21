@@ -12,6 +12,9 @@ const {
     updateMeteranValidator
 } = require('../validators/meteranValidator');
 
+// Penyewa: lihat data meteran unit miliknya
+router.get('/me', verifyToken, meteranController.getMeteranSaya);
+
 // Semua endpoint manajemen meteran khusus admin
 router.get('/', verifyToken, isAdmin, meteranController.getAllMeteran);
 

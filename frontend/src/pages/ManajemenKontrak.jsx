@@ -1,19 +1,61 @@
 import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
-import { useState } from "react";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_KONTRAK } from "../utils/mockData";
+import * as kontrakService from "../services/kontrakService";
+import * as unitService from "../services/unitService";
+import * as userService from "../services/userService";
 
 export default function ManajemenKontrak() {
-  const { data, filters, handleFilterChange, setData } = useTableFilter(MOCK_KONTRAK);
+  const { data, filters, handleFilterChange, setData } = useTableFilter([]);
   const [selectedKontrak, setSelectedKontrak] = useState(null);
-  const [actionType, setActionType] = useState(null); // 'create', 'detail'
+  const [actionType, setActionType] = useState(null); // 'create', 'detail', 'delete'
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Available units and users for dropdowns
+  const [availableUnits, setAvailableUnits] = useState([]);
+  const [availableUsers, setAvailableUsers] = useState([]);
   
   // Form state for creating kontrak
-  const [formNama, setFormNama] = useState("");
+  const [formUser, setFormUser] = useState("");
   const [formUnit, setFormUnit] = useState("");
+  const [formTglMulai, setFormTglMulai] = useState("");
+  const [formTglAkhir, setFormTglAkhir] = useState("");
+  
   const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+
+  const fetchKontrak = async () => {
+    setIsLoading(true);
+    try {
+      const kontraks = await kontrakService.getKontraks();
+      setData(kontraks || []);
+    } catch (error) {
+      console.error("Gagal memuat kontrak", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchDropdownData = async () => {
+    try {
+      const units = await unitService.getUnits();
+      // Filter unit yang "Tersedia"
+      setAvailableUnits(units.filter(u => u.status === 'Tersedia'));
+      
+      const users = await userService.getPenyewa();
+      setAvailableUsers(users);
+    } catch (e) {
+      console.error("Gagal memuat data unit/user", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchKontrak();
+    fetchDropdownData();
+  }, []);
 
   const handleDetailClick = (kontrak) => {
     setSelectedKontrak(kontrak);
@@ -23,35 +65,79 @@ export default function ManajemenKontrak() {
   const handleCreateClick = () => {
     setSelectedKontrak(null);
     setActionType("create");
-    setFormNama("");
+    setFormUser("");
     setFormUnit("");
+    setFormTglMulai(new Date().toISOString().split('T')[0]);
+    
+    // Default 1 tahun
+    const nextYear = new Date();
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    setFormTglAkhir(nextYear.toISOString().split('T')[0]);
   };
 
-  const handleSaveForm = () => {
-    if (!formNama || !formUnit) return;
+  const handleSaveForm = async () => {
+    if (!formUser || !formUnit || !formTglMulai || !formTglAkhir) return;
     
-    if (actionType === "create") {
-      const newKontrak = {
-        id: `C-00${data.length + 3}`, // Mock ID
-        idUnit: "U-NEW",
-        namaUnit: formUnit,
-        lantai: formUnit.includes("1") ? "1" : "2",
-        penyewa: formNama,
-        tglMulai: new Date().toISOString().split('T')[0],
-        tglSelesai: "2027-01-01",
-        status: "Aktif",
-        penyewaDetail: { email: `${formNama.toLowerCase().replace(/\s/g, '')}@gmail.com`, asal: "Unknown", ktp: "00000000", telp: "00000000" }
-      };
-      setData([...data, newKontrak]);
+    setIsLoading(true);
+    try {
+      if (actionType === "create") {
+        await kontrakService.createKontrak({
+          user_id: formUser,
+          unit_id: formUnit,
+          tgl_mulai: formTglMulai,
+          tgl_akhir: formTglAkhir
+        });
+        
+        await fetchKontrak();
+        await fetchDropdownData(); // refresh unit availability
+      }
+      
+      setActionType(null);
+      setFormUser("");
+      setFormUnit("");
+    } catch (e) {
+      console.error("Gagal membuat kontrak", e);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setActionType(null);
-    setFormNama("");
-    setFormUnit("");
+  };
+  
+  const handleEndKontrak = async (id) => {
+    setIsLoading(true);
+    try {
+      await kontrakService.endKontrak(id);
+      await fetchKontrak();
+      await fetchDropdownData();
+    } catch (e) {
+      console.error("Gagal mengakhiri kontrak", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (kontrak) => {
+    setSelectedKontrak(kontrak);
+    setActionType("delete");
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedKontrak) return;
+    setIsLoading(true);
+    try {
+      await kontrakService.deleteKontrak(selectedKontrak.id);
+      await fetchKontrak();
+      await fetchDropdownData();
+      setActionType(null);
+      setSelectedKontrak(null);
+    } catch (e) {
+      console.error("Gagal menghapus kontrak", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formatTanggal = (dateString) => {
-    if (!dateString) return "-";
+    if (!dateString || dateString === "-") return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
@@ -99,7 +185,8 @@ export default function ManajemenKontrak() {
             {/* Tambah Kontrak Button */}
             <button 
               onClick={handleCreateClick}
-              className="w-full md:w-auto h-full min-h-[96px] px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group"
+              disabled={isLoading}
+              className="w-full md:w-auto h-full min-h-[96px] px-8 bg-gray-100 hover:bg-gray-200 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center transition-colors cursor-pointer shrink-0 group disabled:opacity-50"
             >
               <span className="text-primary font-sans text-xl font-bold group-hover:scale-105 transition-transform">+ Buat Kontrak</span>
             </button>
@@ -107,7 +194,12 @@ export default function ManajemenKontrak() {
           </div>
 
           {/* Table */}
-          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[1000px]">
                 <thead>
@@ -137,7 +229,10 @@ export default function ManajemenKontrak() {
                       <td className="py-4 px-6 text-center space-x-4">
                         <button onClick={() => handleDetailClick(kontrak)} className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
                         {kontrak.status === "Aktif" && (
-                          <button className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Akhiri</button>
+                          <button onClick={() => handleEndKontrak(kontrak.id)} className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Akhiri</button>
+                        )}
+                        {kontrak.status === "Selesai" && (
+                          <button onClick={() => handleDeleteClick(kontrak)} className="text-danger hover:text-red-700 font-medium transition-colors cursor-pointer">Hapus</button>
                         )}
                       </td>
                     </tr>
@@ -153,8 +248,17 @@ export default function ManajemenKontrak() {
         </div>
 
         {/* Side Panel (Forms & Actions) */}
-        {(actionType === "create" || actionType === "detail") && (
+        {(actionType === "create" || actionType === "detail" || actionType === "delete") && (
           <div className="w-full xl:w-96 flex flex-col gap-6 shrink-0">
+
+            {/* Delete Confirmation */}
+            {actionType === "delete" && selectedKontrak && (
+              <ConfirmDialog 
+                title={`Hapus kontrak ${selectedKontrak.namaUnit} - ${selectedKontrak.penyewa}?`}
+                onConfirm={confirmDelete}
+                onCancel={() => { setActionType(null); setSelectedKontrak(null); }}
+              />
+            )}
             
             {/* Detail Kontrak */}
             {actionType === "detail" && selectedKontrak && (
@@ -212,46 +316,90 @@ export default function ManajemenKontrak() {
                   <button onClick={() => setActionType(null)} className="text-gray-400 hover:text-gray-600">×</button>
                 </div>
                 
-                <div className="flex flex-col gap-2">
-                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Nama Penyewa</label>
-                  <input 
-                    type="text" 
-                    value={formNama}
-                    onChange={(e) => setFormNama(e.target.value)}
-                    placeholder="Nama Penyewa..." 
-                    className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-gray-800 font-sans outline-none focus:ring-2 focus:ring-primary/50" 
-                  />
-                </div>
-
                 <div className="flex flex-col gap-2 relative">
-                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Pilih Unit</label>
+                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Pilih Penyewa</label>
                   <div 
-                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
+                    onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
                     className="w-full bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer"
                   >
-                    <span className="text-gray-600 font-sans">{formUnit || "Pilih Unit..."}</span>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    <span className="text-gray-600 font-sans truncate">
+                      {formUser ? availableUsers.find(u => u.id_user === formUser)?.name || "Pilih Penyewa..." : "Pilih Penyewa..."}
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0"><path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   </div>
-                  {isUnitDropdownOpen && (
-                    <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-                      {["Kamar 101", "Kamar 102", "Kamar 201", "Kamar 202"].map((unit) => (
+                  {isUserDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {availableUsers.map((user) => (
                         <div 
-                          key={unit} 
-                          onClick={() => { setFormUnit(unit); setIsUnitDropdownOpen(false); }}
+                          key={user.id_user} 
+                          onClick={() => { setFormUser(user.id_user); setIsUserDropdownOpen(false); }}
                           className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
                         >
-                          {unit}
+                          {user.name} ({user.email})
                         </div>
                       ))}
+                      {availableUsers.length === 0 && (
+                        <div className="px-4 py-2 text-gray-500">Tidak ada penyewa.</div>
+                      )}
                     </div>
                   )}
                 </div>
 
+                <div className="flex flex-col gap-2 relative">
+                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Pilih Unit (Hanya Tersedia)</label>
+                  <div 
+                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
+                    className="w-full bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer"
+                  >
+                    <span className="text-gray-600 font-sans truncate">
+                      {formUnit ? availableUnits.find(u => u.id === formUnit)?.nama || "Pilih Unit..." : "Pilih Unit..."}
+                    </span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0"><path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </div>
+                  {isUnitDropdownOpen && (
+                    <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {availableUnits.map((unit) => (
+                        <div 
+                          key={unit.id} 
+                          onClick={() => { setFormUnit(unit.id); setIsUnitDropdownOpen(false); }}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700"
+                        >
+                          {unit.nama} - Lt. {unit.lantai}
+                        </div>
+                      ))}
+                      {availableUnits.length === 0 && (
+                        <div className="px-4 py-2 text-gray-500">Tidak ada unit tersedia.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Mulai</label>
+                  <input 
+                    type="date" 
+                    value={formTglMulai}
+                    onChange={(e) => setFormTglMulai(e.target.value)}
+                    className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-gray-800 font-sans outline-none focus:ring-2 focus:ring-primary/50" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tanggal Selesai</label>
+                  <input 
+                    type="date" 
+                    value={formTglAkhir}
+                    onChange={(e) => setFormTglAkhir(e.target.value)}
+                    className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-gray-800 font-sans outline-none focus:ring-2 focus:ring-primary/50" 
+                  />
+                </div>
+
                 <button 
                   onClick={handleSaveForm}
-                  className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-full transition-colors mt-4 cursor-pointer"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-full transition-colors mt-4 cursor-pointer disabled:opacity-50"
                 >
-                  Buat Kontrak
+                  {isLoading ? "Menyimpan..." : "Buat Kontrak"}
                 </button>
               </div>
             )}

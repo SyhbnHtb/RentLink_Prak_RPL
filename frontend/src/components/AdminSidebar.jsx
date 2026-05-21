@@ -36,6 +36,11 @@ const MENU_ITEMS = [
     icon: "document",
   },
   {
+    label: "Verifikasi Pembayaran",
+    path: "/admin/verifikasi",
+    icon: "document",
+  },
+  {
     label: "Laporan Keuangan",
     path: "/admin/laporan",
     icon: "document",

@@ -1,22 +1,55 @@
 import UserLayout from "../components/UserLayout";
 import StatusBadge from "../components/StatusBadge";
 import { useAuth } from "../contexts/AuthContext";
-import { MOCK_TAGIHAN, MOCK_KONTRAK } from "../utils/mockData";
-
+import { useState, useEffect } from "react";
+import * as tagService from "../services/tagService";
+import * as userService from "../services/userService";
 
 export default function GroupUser() {
   const { user } = useAuth();
   const userName = user?.name || "Nasir";
 
-  // Filter data for the specific user
-  const userTagihan = MOCK_TAGIHAN.filter(t => t.penyewa === userName);
-  const userKontrak = MOCK_KONTRAK.filter(k => k.penyewa === userName);
+  const [activeTagihanList, setActiveTagihanList] = useState([]);
+  const [riwayatTagihanList, setRiwayatTagihanList] = useState([]);
+  const [activeUnit, setActiveUnit] = useState("-");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [tagihan, riwayat, unit] = await Promise.all([
+          tagService.getTagihanSaya(),
+          tagService.getRiwayatSaya(),
+          userService.getUnitSaya()
+        ]);
+
+        if (tagihan) setActiveTagihanList(tagihan);
+        if (riwayat) {
+          // Format riwayat mapping just like in riwayat page
+          const formattedRiwayat = riwayat.map(r => ({
+            id: r.kode_invoice || `INV-${r.tagihan_id}`,
+            namaUnit: r.nama_unit,
+            tglDibayar: r.tanggal,
+            total: r.total,
+            status: r.status_pembayaran
+          }));
+          setRiwayatTagihanList(formattedRiwayat);
+        }
+        if (unit) setActiveUnit(unit.nama_unit);
+      } catch (error) {
+        console.error("Gagal mengambil data dashboard user", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Stats calculations
-  const tagihanAktif = userTagihan.filter(t => t.status === "Belum Bayar" || t.status === "Menunggu Konfirmasi")[0];
+  const tagihanAktif = activeTagihanList[0];
   const totalTagihanValue = tagihanAktif ? tagihanAktif.total : 0;
   const statusPembayaran = tagihanAktif ? tagihanAktif.status : "Approved";
-  const activeUnit = userKontrak.find(k => k.status === "Aktif")?.namaUnit || "-";
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -37,13 +70,16 @@ export default function GroupUser() {
     });
   };
 
-  const activeTagihanList = userTagihan.filter(t => t.status !== "Approved" && t.status !== "Selesai");
-  const riwayatTagihanList = userTagihan.filter(t => t.status === "Approved" || t.status === "Selesai");
-
   return (
     <UserLayout title={`Selamat Datang Kembali, ${userName}!`}>
-      <div className="flex flex-col gap-10 w-full max-w-7xl">
+      <div className="flex flex-col gap-10 w-full max-w-7xl relative">
         
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
           
@@ -112,10 +148,7 @@ export default function GroupUser() {
                         <StatusBadge variant={tagihan.status} />
                       </td>
                       <td className="py-4 px-6 text-center space-x-4">
-                        <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
-                        {tagihan.status === "Belum Bayar" && (
-                          <button className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Bayar</button>
-                        )}
+                        <a href="/group-user/tagihan" className="text-blue-500 hover:text-blue-700 font-medium transition-colors cursor-pointer">Lihat Tagihan</a>
                       </td>
                     </tr>
                   )) : (
@@ -155,10 +188,10 @@ export default function GroupUser() {
                       <td className="py-4 px-6 text-gray-800">{formatTanggal(riwayat.tglDibayar)}</td>
                       <td className="py-4 px-6 text-gray-800">{formatRupiah(riwayat.total)}</td>
                       <td className="py-4 px-6">
-                        <StatusBadge variant="Selesai" />
+                        <StatusBadge variant={riwayat.status === 'lunas' ? 'Selesai' : 'Ditolak'} />
                       </td>
                       <td className="py-4 px-6 text-center space-x-4">
-                        <button className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
+                        <a href="/group-user/tagihan" className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</a>
                       </td>
                     </tr>
                   )) : (

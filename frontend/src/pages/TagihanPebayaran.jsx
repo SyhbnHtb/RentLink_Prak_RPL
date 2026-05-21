@@ -2,17 +2,42 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import { toast } from "react-hot-toast";
+import * as tagService from "../services/tagService";
+import api from "../services/api";
 
 export default function TagihanPebayaran() {
   const navigate = useNavigate();
-  const { data, filters, handleFilterChange, setData, sortConfig, handleSort } = useTableFilter(MOCK_TAGIHAN);
+  const { data, filters, handleFilterChange, setData, sortConfig, handleSort } = useTableFilter([]);
   const [selectedTagihan, setSelectedTagihan] = useState(null);
-  const [actionType, setActionType] = useState(null); // 'detail', 'delete'
+  const [actionType, setActionType] = useState(null); // 'detail', 'delete', 'generate'
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Generate form state
+  const [genBulan, setGenBulan] = useState("");
+  const [genTahun, setGenTahun] = useState(new Date().getFullYear().toString());
+  const [isGenBulanOpen, setIsGenBulanOpen] = useState(false);
+  const BULAN_LIST = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+  const fetchTagihan = async () => {
+    setIsLoading(true);
+    try {
+      const tagihanList = await tagService.getTagihan();
+      setData(tagihanList || []);
+    } catch (e) {
+      console.error("Gagal memuat tagihan", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTagihan();
+  }, []);
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -24,7 +49,7 @@ export default function TagihanPebayaran() {
   };
 
   const formatTanggal = (dateString) => {
-    if (!dateString) return "-";
+    if (!dateString || dateString === "-") return "-";
     const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       day: "numeric",
@@ -43,10 +68,46 @@ export default function TagihanPebayaran() {
     setActionType("delete");
   };
 
-  const confirmDelete = () => {
-    setData(data.filter(item => item.id !== selectedTagihan.id));
-    setActionType(null);
-    setSelectedTagihan(null);
+  const confirmDelete = async () => {
+    if (!selectedTagihan) return;
+    setIsLoading(true);
+    try {
+      await tagService.deleteTagihan(selectedTagihan.id);
+      await fetchTagihan();
+      setActionType(null);
+      setSelectedTagihan(null);
+    } catch (e) {
+      console.error("Gagal menghapus tagihan", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!genBulan || !genTahun) {
+      toast.error("Pilih bulan dan tahun terlebih dahulu");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await api.post('/tagihan/generate', {
+        bulan: genBulan,
+        tahun: Number(genTahun)
+      });
+      if (response.data.success) {
+        const hasil = response.data.data;
+        const berhasil = hasil.hasilGenerate?.length || 0;
+        const gagal = hasil.gagalGenerate?.length || 0;
+        toast.success(`${berhasil} tagihan berhasil di-generate${gagal > 0 ? `, ${gagal} dilewati` : ''}`);
+        await fetchTagihan();
+        setActionType(null);
+      }
+    } catch (e) {
+      const msg = e.response?.data?.message || "Gagal generate tagihan";
+      toast.error(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -104,8 +165,22 @@ export default function TagihanPebayaran() {
             </div>
           </div>
 
+          {/* Generate Tagihan Button */}
+          <button 
+            onClick={() => setActionType("generate")}
+            disabled={isLoading}
+            className="w-full md:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+          >
+            ⚡ Generate Tagihan
+          </button>
+
           {/* Table */}
-          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-gray-100 shadow-md overflow-hidden relative">
+            {isLoading && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
@@ -113,7 +188,7 @@ export default function TagihanPebayaran() {
                     <th className="py-4 px-6 font-medium whitespace-nowrap">ID</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Nama Unit</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Penyewa Unit</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Dibayar</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Dibuat</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Total</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Opsi</th>
@@ -182,8 +257,8 @@ export default function TagihanPebayaran() {
                   <div className="flex flex-col gap-1 border-t border-gray-100 pt-4 mt-2">
                     <span className="text-primary/70 text-xs font-bold uppercase tracking-wider mb-2">Biaya Sewa</span>
                     <div className="flex justify-between text-sm font-semibold text-primary">
-                      <span>Periode (hari)</span>
-                      <span>{selectedTagihan.periode} hari</span>
+                      <span>Periode</span>
+                      <span>{selectedTagihan.periode}</span>
                     </div>
                     <div className="flex justify-between text-sm font-semibold text-primary">
                       <span>Kamar</span>
@@ -208,10 +283,6 @@ export default function TagihanPebayaran() {
                     <span className="text-primary font-bold text-lg">{formatTanggal(selectedTagihan.tglDibayar)}</span>
                   </div>
                 </div>
-
-                <button className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer">
-                  Lihat Bukti Pembayaran
-                </button>
 
                 {selectedTagihan.status === "Menunggu Konfirmasi" && (
                   <button
@@ -238,14 +309,52 @@ export default function TagihanPebayaran() {
                 <h2 className="text-gray-900 font-bold text-xl mb-1">Hapus Tagihan?</h2>
                 <p className="text-gray-500 text-sm mb-4">Tagihan ini akan dihapus dan dipindahkan ke riwayat.</p>
                 <div className="flex flex-col gap-3 w-full">
-                  <button onClick={confirmDelete} className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer">Ya, Hapus</button>
-                  <button onClick={() => setActionType(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer">Batal</button>
+                  <button disabled={isLoading} onClick={confirmDelete} className="w-full py-3 bg-danger hover:bg-red-700 text-white font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">
+                    {isLoading ? "Menghapus..." : "Ya, Hapus"}
+                  </button>
+                  <button disabled={isLoading} onClick={() => setActionType(null)} className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">Batal</button>
                 </div>
               </div>
             )}
 
           </div>
         )}
+      </Modal>
+
+      {/* Generate Tagihan Modal */}
+      <Modal isOpen={actionType === "generate"} onClose={() => setActionType(null)}>
+        <div className="bg-surface p-6 flex flex-col gap-5 relative">
+          <button onClick={() => setActionType(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">×</button>
+          <h2 className="text-2xl font-bold text-primary">Generate Tagihan</h2>
+          <p className="text-gray-500 text-sm -mt-2">Tagihan akan di-generate untuk semua kontrak aktif berdasarkan data meteran periode yang dipilih.</p>
+
+          <div className="flex flex-col gap-2 relative">
+            <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Bulan</label>
+            <div onClick={() => setIsGenBulanOpen(!isGenBulanOpen)} className="w-full bg-gray-100 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer">
+              <span className="text-gray-600 font-sans">{genBulan || "Pilih Bulan..."}</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            {isGenBulanOpen && (
+              <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+                {BULAN_LIST.map((b) => (
+                  <div key={b} onClick={() => { setGenBulan(b); setIsGenBulanOpen(false); }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-700">{b}</div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-primary/70 text-xs font-bold uppercase tracking-wider">Tahun</label>
+            <input type="number" value={genTahun} onChange={(e) => setGenTahun(e.target.value)} placeholder="2025" className="w-full bg-gray-100 border-none rounded-xl px-4 py-3 text-gray-800 font-sans outline-none focus:ring-2 focus:ring-primary/50" />
+          </div>
+
+          <div className="flex gap-3 mt-2">
+            <button onClick={() => setActionType(null)} disabled={isLoading} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">Batal</button>
+            <button onClick={handleGenerate} disabled={isLoading} className="flex-1 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-colors cursor-pointer disabled:opacity-50">
+              {isLoading ? "Generating..." : "Generate"}
+            </button>
+          </div>
+        </div>
       </Modal>
 
     </AdminLayout>

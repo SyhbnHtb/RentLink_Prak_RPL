@@ -1,20 +1,40 @@
 import UserLayout from "../components/UserLayout";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import * as tagService from "../services/tagService";
+import { toast } from "react-hot-toast";
 
 export default function UserTagihan() {
   const { user } = useAuth();
-  const userName = user?.name || "Nasir";
-
+  
   // Tab state: "aktif" | "riwayat"
   const [activeTab, setActiveTab] = useState("aktif");
 
   const [selectedTagihan, setSelectedTagihan] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [userTagihan, setUserTagihan] = useState([]);
+
+  const fetchTagihan = async () => {
+    setIsLoading(true);
+    try {
+      const data = await tagService.getTagihanSaya();
+      setUserTagihan(data || []);
+    } catch (e) {
+      console.error("Gagal mengambil tagihan saya", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTagihan();
+  }, []);
 
   const openDetailModal = (tagihan) => {
     setSelectedTagihan(tagihan);
@@ -23,6 +43,7 @@ export default function UserTagihan() {
 
   const openUploadModal = (tagihan) => {
     setSelectedTagihan(tagihan);
+    setSelectedFile(null);
     setIsUploadModalOpen(true);
   };
 
@@ -30,10 +51,27 @@ export default function UserTagihan() {
     setIsDetailModalOpen(false);
     setIsUploadModalOpen(false);
     setSelectedTagihan(null);
+    setSelectedFile(null);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile || !selectedTagihan) return;
+    
+    setIsUploading(true);
+    try {
+      await tagService.uploadBukti(selectedTagihan.id, selectedFile);
+      toast.success("Bukti pembayaran berhasil diupload!");
+      await fetchTagihan();
+      closeModal();
+    } catch (error) {
+      console.error("Gagal mengupload bukti", error);
+      toast.error("Gagal mengupload bukti pembayaran. Silakan coba lagi.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // Filter data
-  const userTagihan = MOCK_TAGIHAN.filter((t) => t.penyewa === userName);
   const activeTagihan = userTagihan.filter(
     (t) => t.status !== "Approved" && t.status !== "Selesai"
   );
@@ -66,7 +104,13 @@ export default function UserTagihan() {
 
   return (
     <UserLayout title="Tagihan & Riwayat">
-      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start">
+      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start relative">
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
@@ -164,7 +208,7 @@ export default function UserTagihan() {
                         <td className="py-4 px-6 text-gray-800 font-medium">{tagihan.id}</td>
                         <td className="py-4 px-6 text-gray-800">{tagihan.namaUnit}</td>
                         <td className="py-4 px-6 text-gray-800">
-                          {tagihan.bulan} ({tagihan.periode} hari)
+                          {tagihan.periode}
                         </td>
                         <td className="py-4 px-6 text-gray-800 font-semibold">
                           {formatRupiah(tagihan.total)}
@@ -312,7 +356,7 @@ export default function UserTagihan() {
               </div>
               <div>
                 <p className="text-primary font-bold">{selectedTagihan.namaUnit}</p>
-                <p className="text-primary/60 text-sm">{selectedTagihan.bulan}</p>
+                <p className="text-primary/60 text-sm">{selectedTagihan.periode}</p>
               </div>
             </div>
 
@@ -333,7 +377,7 @@ export default function UserTagihan() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 font-medium">Periode</span>
                   <span className="text-gray-900 font-semibold">
-                    {selectedTagihan.periode} hari
+                    {selectedTagihan.periode}
                   </span>
                 </div>
               )}
@@ -410,43 +454,77 @@ export default function UserTagihan() {
               </span>
               <span className="text-gray-500 text-sm mt-1">
                 Tagihan untuk <strong>{selectedTagihan.namaUnit}</strong> periode{" "}
-                <strong>{selectedTagihan.bulan}</strong>
+                <strong>{selectedTagihan.periode}</strong>
               </span>
             </div>
 
             {/* Drop Zone */}
-            <div className="w-full h-48 bg-gray-50 rounded-xl border-2 border-dashed border-secondary/50 flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-secondary/10 transition-colors mt-2">
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                className="text-primary/50"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-              <p className="text-primary font-sans font-semibold text-sm">
-                Choose File or Drag File
-              </p>
-              <p className="text-gray-400 text-xs">File Type: JPG, PNG, PDF</p>
+            <div className="w-full relative mt-2">
+              <input 
+                type="file" 
+                id="bukti-upload" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                accept="image/jpeg, image/png, application/pdf"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setSelectedFile(e.target.files[0]);
+                  }
+                }}
+              />
+              <div className={`w-full h-48 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-colors ${selectedFile ? 'bg-secondary/10 border-secondary' : 'bg-gray-50 border-secondary/50 hover:bg-secondary/10'}`}>
+                {selectedFile ? (
+                  <>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary">
+                      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                      <polyline points="13 2 13 9 20 9" />
+                    </svg>
+                    <p className="text-primary font-sans font-semibold text-sm">
+                      {selectedFile.name}
+                    </p>
+                    <p className="text-gray-500 text-xs text-center px-4 truncate w-full">
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary/50">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <p className="text-primary font-sans font-semibold text-sm">
+                      Choose File or Drag File
+                    </p>
+                    <p className="text-gray-400 text-xs">File Type: JPG, PNG, PDF</p>
+                  </>
+                )}
+              </div>
             </div>
 
             <div className="flex gap-3 mt-4">
               <button
                 onClick={closeModal}
-                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer text-sm"
+                disabled={isUploading}
+                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-full transition-colors cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
               <button
-                onClick={closeModal}
-                className="flex-1 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-colors cursor-pointer text-sm"
+                onClick={handleUpload}
+                disabled={!selectedFile || isUploading}
+                className="flex-1 py-3 bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-colors cursor-pointer text-sm flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Kirim Bukti
+                {isUploading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Uploading...
+                  </span>
+                ) : (
+                  "Kirim Bukti"
+                )}
               </button>
             </div>
           </div>

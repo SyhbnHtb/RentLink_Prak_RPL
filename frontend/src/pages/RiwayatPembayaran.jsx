@@ -2,16 +2,43 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import * as tagService from "../services/tagService";
 
 export default function RiwayatPembayaran() {
-  const { data, filters, handleFilterChange, sortConfig, handleSort } = useTableFilter(
-    MOCK_TAGIHAN.filter(t => t.status === "Approved" || t.status === "Selesai")
-  );
+  const { data, filters, handleFilterChange, sortConfig, handleSort, setData } = useTableFilter([]);
   const [selectedRiwayat, setSelectedRiwayat] = useState(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchRiwayat = async () => {
+      setIsLoading(true);
+      try {
+        const riwayatData = await tagService.getRiwayat();
+        const formatted = riwayatData.map(r => ({
+          id: r.kode_invoice || `INV-${r.tagihan_id}`,
+          namaUnit: r.nama_unit || `Unit ${r.id_kontrak}`,
+          penyewa: r.nama_penyewa,
+          tglDibayar: r.tanggal,
+          total: r.total,
+          periode: r.periode,
+          kamar: r.biaya_sewa,
+          status: r.status_pembayaran,
+          bukti: r.bukti_pembayaran
+        }));
+        // Filter out non-finished if necessary, but riwayat might be all finished or rejected
+        const finished = formatted.filter(r => r.status === 'lunas' || r.status === 'ditolak');
+        setData(finished);
+      } catch (e) {
+        console.error("Gagal mengambil riwayat pembayaran", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRiwayat();
+  }, [setData]);
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -34,8 +61,14 @@ export default function RiwayatPembayaran() {
 
   return (
     <AdminLayout title="Riwayat Pembayaran">
-      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start">
+      <div className="flex flex-col gap-8 w-full max-w-[1600px] items-start relative">
         
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
         {/* Main Content Area */}
         <div className="flex flex-col gap-8 w-full">
           
@@ -106,7 +139,7 @@ export default function RiwayatPembayaran() {
                       <td className="py-4 px-6 text-gray-800">{formatTanggal(riwayat.tglDibayar)}</td>
                       <td className="py-4 px-6 text-gray-800">{formatRupiah(riwayat.total)}</td>
                       <td className="py-4 px-6">
-                        <StatusBadge variant="Selesai" />
+                        <StatusBadge variant={riwayat.status === 'lunas' ? 'Selesai' : 'Ditolak'} />
                       </td>
                       <td className="py-4 px-6 text-center">
                         <button onClick={() => setSelectedRiwayat(riwayat)} className="text-primary hover:text-secondary font-medium transition-colors cursor-pointer">Detail</button>
@@ -136,7 +169,7 @@ export default function RiwayatPembayaran() {
               
               <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl mt-2">
                 <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shrink-0">
-                  <span className="text-secondary font-bold text-xl">{selectedRiwayat.penyewa.charAt(0).toUpperCase()}</span>
+                  <span className="text-secondary font-bold text-xl">{selectedRiwayat.penyewa?.charAt(0).toUpperCase()}</span>
                 </div>
                 <div className="flex flex-col">
                   <h3 className="text-primary font-bold text-xl">{selectedRiwayat.penyewa}</h3>
@@ -154,7 +187,7 @@ export default function RiwayatPembayaran() {
                   <span className="text-primary/70 text-xs font-bold uppercase tracking-wider mb-2">Biaya Sewa</span>
                   <div className="flex justify-between text-sm font-semibold text-primary">
                     <span>Periode (hari)</span>
-                    <span>{selectedRiwayat.periode} hari</span>
+                    <span>{selectedRiwayat.periode || 30} hari</span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold text-primary">
                     <span>Kamar</span>
@@ -172,9 +205,20 @@ export default function RiwayatPembayaran() {
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer">
-                Lihat Bukti Pembayaran
-              </button>
+              {selectedRiwayat.bukti ? (
+                <a 
+                  href={`http://localhost:5001${selectedRiwayat.bukti}`} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer text-center block"
+                >
+                  Lihat Bukti Pembayaran
+                </a>
+              ) : (
+                <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl mt-2 cursor-not-allowed">
+                  Tidak Ada Bukti
+                </button>
+              )}
             </div>
 
           </div>

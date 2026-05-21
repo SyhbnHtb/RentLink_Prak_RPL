@@ -145,7 +145,8 @@ const generateTagihan = async (req, res) => {
 // GET /api/tagihan
 const getAllTagihan = async (req, res) => {
     try {
-        const tagihan = await tagihanModel.getAllTagihan();
+        const { search, status, bulan, tahun, sort } = req.query || {};
+        const tagihan = await tagihanModel.getAllTagihan({ search, status, bulan, tahun, sort });
 
         res.status(200).json({
             success: true,

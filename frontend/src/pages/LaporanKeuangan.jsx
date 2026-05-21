@@ -2,15 +2,63 @@ import AdminLayout from "../components/AdminLayout";
 import FilterControl from "../components/FilterControl";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../components/Modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTableFilter } from "../hooks/useTableFilter";
-import { MOCK_TAGIHAN } from "../utils/mockData";
+import api from "../services/api";
 
 export default function LaporanKeuangan() {
-  const { data, filters, handleFilterChange, sortConfig, handleSort } =
-    useTableFilter(MOCK_TAGIHAN);
+  const { data, filters, handleFilterChange, sortConfig, handleSort, setData } =
+    useTableFilter([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [ringkasan, setRingkasan] = useState(null);
+
+  const fetchLaporan = async (filterBulan, filterTahun) => {
+    setIsLoading(true);
+    try {
+      const params = {};
+      if (filterBulan && filterBulan !== 'All') params.bulan = filterBulan;
+      if (filterTahun && filterTahun !== 'All') params.tahun = filterTahun;
+      // Only pass both or neither
+      if ((params.bulan && !params.tahun) || (!params.bulan && params.tahun)) {
+        // Need both bulan and tahun for the API
+        if (!params.bulan) delete params.tahun;
+        if (!params.tahun) delete params.bulan;
+      }
+      const response = await api.get('/laporan/keuangan', { params });
+      if (response.data.success) {
+        setRingkasan(response.data.data.ringkasan);
+        const laporan = response.data.data.laporan || [];
+        const mapped = laporan.map(l => ({
+          id: l.kode_invoice || `INV-${String(l.tagihan_id).padStart(3, '0')}`,
+          penyewa: l.nama_penyewa,
+          namaUnit: l.nama_unit,
+          tglDibayar: l.tanggal,
+          kamar: Number(l.biaya_sewa),
+          listrik: Number(l.biaya_listrik),
+          air: Number(l.biaya_air),
+          total: Number(l.total),
+          status: l.status_tagihan === 'lunas' ? "Approved" : (l.status_tagihan === 'pending' ? "Menunggu Konfirmasi" : "Belum Bayar"),
+          periode: l.periode
+        }));
+        setData(mapped);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil laporan keuangan", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLaporan(filters.bulan, filters.tahun);
+  }, [filters.bulan, filters.tahun]);
+
+  const totalPemasukan = ringkasan ? ringkasan.total_pemasukan : 0;
+  const totalBelumLunas = ringkasan ? ringkasan.total_belum_lunas : 0;
+  const totalUnitAktif = ringkasan ? ringkasan.jumlah_unit_tertagih : 0;
+  const totalSelesai = ringkasan ? ringkasan.jumlah_transaksi : 0;
 
   const formatRupiah = (number) => {
     if (number === null || number === undefined) return "Rp -";
@@ -30,32 +78,21 @@ export default function LaporanKeuangan() {
     });
   };
 
-  // Hitung summary dari MOCK_TAGIHAN
-  const totalPemasukan = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai"
-  ).reduce((sum, t) => sum + (t.total || 0), 0);
-
-  const totalBelumLunas = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Belum Bayar"
-  ).reduce((sum, t) => sum + (t.total || 0), 0);
-
-  const totalUnitAktif = new Set(
-    MOCK_TAGIHAN.map((t) => t.namaUnit)
-  ).size;
-
-  const totalSelesai = MOCK_TAGIHAN.filter(
-    (t) => t.status === "Approved" || t.status === "Selesai"
-  ).length;
-
   return (
     <AdminLayout title="Laporan Keuangan">
-      <div className="flex flex-col gap-10 w-full max-w-7xl">
+      <div className="flex flex-col gap-10 w-full max-w-7xl relative">
+
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center min-h-[300px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 w-full">
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
             <p className="text-gray-500 font-sans text-sm font-medium uppercase tracking-wider">
-              Total Pemasukan Bulan Ini
+              Total Pemasukan
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
               {formatRupiah(totalPemasukan)}
@@ -71,7 +108,7 @@ export default function LaporanKeuangan() {
           </div>
           <div className="bg-surface rounded-2xl border border-gray-100 shadow-md p-6 flex flex-col gap-2">
             <p className="text-gray-500 font-sans text-sm font-medium uppercase tracking-wider">
-              Total Unit Aktif
+              Total Unit Tertagih
             </p>
             <p className="text-gray-900 font-sans text-3xl font-bold">
               {totalUnitAktif}
@@ -200,7 +237,7 @@ export default function LaporanKeuangan() {
                     <th className="py-4 px-6 font-medium whitespace-nowrap">ID Invoice</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Penyewa</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Unit</th>
-                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Bayar</th>
+                    <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Total</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                     <th className="py-4 px-6 font-medium whitespace-nowrap text-center">Opsi</th>
@@ -269,7 +306,7 @@ export default function LaporanKeuangan() {
             <div className="flex items-center gap-4 bg-secondary/20 p-4 rounded-2xl mt-2">
               <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shrink-0">
                 <span className="text-secondary font-bold text-xl">
-                  {selectedItem.penyewa.charAt(0).toUpperCase()}
+                  {selectedItem.penyewa?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -291,8 +328,8 @@ export default function LaporanKeuangan() {
                   Biaya Sewa
                 </span>
                 <div className="flex justify-between text-sm font-semibold text-primary">
-                  <span>Periode (hari)</span>
-                  <span>{selectedItem.periode} hari</span>
+                  <span>Periode</span>
+                  <span>{selectedItem.periode || 30} hari</span>
                 </div>
                 <div className="flex justify-between text-sm font-semibold text-primary">
                   <span>Kamar</span>
@@ -321,7 +358,7 @@ export default function LaporanKeuangan() {
 
               <div className="flex flex-col gap-1 border-t border-gray-100 pt-4">
                 <span className="text-primary/70 text-xs font-bold uppercase tracking-wider">
-                  Dibayar Pada
+                  Tanggal
                 </span>
                 <span className="text-primary font-bold text-lg">
                   {formatTanggal(selectedItem.tglDibayar)}
@@ -329,9 +366,6 @@ export default function LaporanKeuangan() {
               </div>
             </div>
 
-            <button className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-primary font-bold rounded-xl transition-colors mt-2 cursor-pointer">
-              Lihat Bukti Pembayaran
-            </button>
           </div>
         )}
       </Modal>

@@ -5,7 +5,7 @@ import { register } from "../services/authService";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,13 +22,13 @@ export default function RegisterPage() {
       setError("Password dan Confirm Password tidak cocok.");
       return;
     }
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       setError("Semua field harus diisi.");
       return;
     }
 
     setLoading(true);
-    const result = await register({ username, email, password, confirmPassword });
+    const result = await register({ name, email, password });
     setLoading(false);
 
     if (result.success) {
@@ -57,15 +57,15 @@ export default function RegisterPage() {
           
           <form className="w-full max-w-[480px] flex flex-col gap-6" onSubmit={handleRegister}>
             
-            {/* Username */}
+            {/* Name */}
             <div className="flex flex-col gap-2">
               <label className="text-[#FBF8F3] font-sans text-xl font-bold tracking-[0.15em] ml-1">
-                Username
+                Name
               </label>
               <input 
                 type="text" 
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full h-14 bg-[#D9D9D9] rounded-xl px-5 text-gray-900 outline-none focus:ring-2 focus:ring-secondary font-sans text-lg"
               />
             </div>
